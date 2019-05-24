@@ -1,7 +1,7 @@
 //import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
-
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 /*
   Generated class for the DatabaseProvider provider.
@@ -24,11 +24,24 @@ export class DatabaseProvider {
       this.storage = new SQLite();
       this.storage.create({ name: "topmedic02.db", location: "default" }).then((db: SQLiteObject) => {
         this.db = db;
-        db.executeSql("CREATE TABLE IF NOT EXISTS horarios (id INTEGER PRIMARY KEY AUTOINCREMENT, fecha_consulta text, hora text, horb text, descripcion text, link_token text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []);
+
+        db.executeSql("CREATE TABLE IF NOT EXISTS datosPaciente (id INTEGER PRIMARY KEY AUTOINCREMENT, fecha_consulta text, hora text, horb text, descripcion text, link_token text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []).then(()=>{
+          
+            db.executeSql("CREATE TABLE IF NOT EXISTS horarios (id INTEGER PRIMARY KEY AUTOINCREMENT, fecha_consulta text, hora text, horb text, descripcion text, link_token text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []);
+        
+        }).catch((err)=>console.log("error detected creating tables", err));
+
+
+
+
+
         this.isOpen = true;
+
+
       }).catch((error) => {
         console.log(error);
       })
+
     }
 
   }
@@ -162,6 +175,40 @@ limpiarTabla(){
   }
 /***********************************************************************************************************/
 /***********************************************************************************************************/  
+
+
+
+/***********************************************************************************************************/
+/***************************** Funciones para almacenar datos la primera vez *******************************/
+/***********************************************************************************************************/
+almacenarHorariosCitasEnBD(id: string, fecha_consulta:string, hora:string, horb: string, Doctor: string, numCitas:number ){
+  console.log("Desde funcion de almacenamiento: \nId: "+id+" \nFecha: "+fecha_consulta+" \nHora: "+hora+" "+" \nHora Fin: "+horb+" \nDoctor: "+Doctor+" \nnumCitas: "+numCitas+"")
+
+  return new Promise ((resolve, reject) => {
+                                
+    let sql = "INSERT INTO horarios (id,fecha_consulta, hora, horb, Doctor) VALUES (?, ?, ?, ?, ?)";
+    this.db.executeSql(sql, [id,fecha_consulta, hora, horb, Doctor]).then((data) =>{
+    //Aqui iba el resolve  
+      //alert("Duda: "+data)
+      //console.log("Duda CONVERTIDA: "+JSON.stringify(data))
+    }, (error) => {
+      //alert("Insert db function: "+JSON.stringify(error))
+      reject(error);
+    });
+    this.contador++; 
+    resolve(this.contador);   
+    
+    if(this.contador == numCitas){
+      //alert("Contador local: "+this.contador+" \nParametro: "+numCitas)        
+      //alert("Se reiniciara el contador a 0")
+      this.contador = 0;
+    }else{
+      
+    }
+//      resolve(this.contador);     
+  });
+}
+
 
 /***********************************************************************************************************/
 /***********************************************************************************************************/

@@ -8,9 +8,12 @@ import { LocalNotifications } from '@ionic-native/local-notifications';
 import { Platform } from 'ionic-angular';
 import { CrearCitaPage } from '../crear-cita/crear-cita';
 import { LoadingController } from 'ionic-angular';
-
+import { RequestOptions,Headers } from '@angular/http';
 import { UniqueDeviceID } from '@ionic-native/unique-device-id';
 
+//Archivo donde estan las funciones: /wp-content/plugins/bkcom/classes/bup.complement.profile.class.php
+//Linea 27 donde esta declarada la funcion bup_check_adm_availability_sfaff
+//1483 esta mejor explicado
 
 @Component({
   selector: 'page-home',
@@ -282,24 +285,94 @@ checarCambiosNotificacionesRecibidas(){
   /********** Esta se tiene que ejecutar para obtener los datos de la BD en el servidor de expediente ***********/
   /**************************************************************************************************************/          
   consultarHorariosBDremota2(){
-    if(window.localStorage.getItem("id_doctor") != undefined)
-    {     
-      console.log("Estado notificacion recibida: "+localStorage.getItem("NotificacionRecibida"))
-      //alert("Se haran cambios en la base local por que se detectó una notificacion") 
-//      var link = 'http://93.104.215.239/ecg_mqtt/DATABASE/agendaMedicos.php';
-      var link = 'https://topmedic.com.mx/accessDatabase/wp_DB/service/recibirDatos.php';
-      
+    const headers = new Headers()
+    headers.append('Content-Type','application/json')
+    headers.append('Authorization','Token '+window.localStorage.getItem("id_doctor")) //Aqui se agrega el key del medico obtenido del login
+
+    let options = new RequestOptions({ headers: headers });
+
+    //alert(JSON.stringify(options))
+    
+      console.log("Estado notificacion recibida: "+localStorage.getItem("NotificacionRecibida"))     
+
+      var link = 'http://104.248.176.189:8001/api/v1/patients/';
       var id_medico = JSON.stringify({id_medico: window.localStorage.getItem("id_doctor")});
-            
-        this.http.post(link, id_medico)
+         
+      
+        this.http.get(link, options)
         .subscribe(data => {
             this.data.response = data["_body"]; 
 
             this.resp = JSON.parse(this.data.response);
-            //alert(this.resp['respValue'])
-                  if(this.resp['respValue'] == "200" ){
-                    this.horarios_medico = JSON.stringify(this.resp['horarios']);
-                    this.numeroFilas = JSON.stringify(this.resp['numFilas']);
+
+//alert(JSON.stringify(this.resp))
+//alert(JSON.stringify(this.resp['results']))
+console.log(JSON.stringify(this.resp))
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //Aqui recuperaremos todas las citas de cada medico
+        var link2 = 'http://104.248.176.189:8001/api/v1/schedule/';
+
+        this.http.get(link2, options)
+        .subscribe(data => {
+
+            this.data.response = data["_body"]; 
+
+            this.resp = JSON.parse(this.data.response);
+
+            alert(JSON.stringify(this.resp))
+            alert(JSON.stringify(this.resp['results']))
+            console.log(JSON.stringify(this.resp))
+
+            this.horarios_medico = JSON.stringify(this.resp['results']);//Datos de usuarios
+            this.numeroFilas = JSON.stringify(this.resp['count']);
+            console.log("Resultado consulta: "+JSON.stringify(this.resp))
+            window.localStorage.setItem("numFilasDBActual",this.numeroFilas)
+
+        },  error => {
+                alert("XD No se pudieron obtener las citas :(");
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ //                 if(this.resp['respValue'] == "200" ){
+                    
+                    this.horarios_medico = JSON.stringify(this.resp['results']);//Datos de usuarios
+                    this.numeroFilas = JSON.stringify(this.resp['count']);
                     console.log("Resultado consulta: "+JSON.stringify(this.resp))
                     window.localStorage.setItem("numFilasDBActual",this.numeroFilas)
                     //alert("LocalStorageXD: "+window.localStorage.getItem("numFilasDBremota")+" numberFilas:"+this.numeroFilas)
@@ -316,7 +389,9 @@ checarCambiosNotificacionesRecibidas(){
                     }
                     //this.playAudio(); //Esta funcion la utilizabamos antes de usar las notificaciones
                     localStorage.setItem("NotificacionRecibida","0")
-                }else if(this.resp['respValue'] == "400"){
+
+//               }else if(this.resp['respValue'] == "400"){
+                  /*
                   this.loading.dismiss(); 
                   this.clearCalendar()
                   if(localStorage.getItem("alertDatosConsultadosLanzada") == "0"){
@@ -324,18 +399,18 @@ checarCambiosNotificacionesRecibidas(){
                     this.clearCalendar()
                   }
                   localStorage.setItem("alertDatosConsultadosLanzada","1")
-                  
+
                 }
-                
+*/              
 
         },  error => {
             console.log("Oooops!");
-            alert("No se pudieron enviar los datos\nIntentelo mas tarde");
+            alert("XD No se pudieron enviar los datos\nIntentelo mas tarde");
             });
             localStorage.setItem("NotificacionRecibida","0") 
-    }else{
-            alert("El doctor no tiene un  ID asignado")
-         }   
+
+
+  
   }
 
   clearCalendar(){

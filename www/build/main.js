@@ -57,7 +57,7 @@ var CrearCitaPage = /** @class */ (function () {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return LoginPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__home_home__ = __webpack_require__(157);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -68,6 +68,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+
 
 
 
@@ -142,37 +143,49 @@ var LoginPage = /** @class */ (function () {
     };
     LoginPage.prototype.login = function () {
         var _this = this;
+        var headers = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        var options = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["d" /* RequestOptions */]({ headers: headers });
         if (this.user != "" && this.pass != "") {
-            //alert("boton presionado!")
-            //      var link = 'http://93.104.215.239/ecg_mqtt/DATABASE/agendaMedicos.php';
-            //      var link = 'https://topmedic.com.mx/accessDatabase/AgendaTopMedicos/agendaMedicos.php';     
-            var link = 'https://topmedic.com.mx/accessDatabase/wp_DB/service/recibirDatos.php';
-            var credentials = JSON.stringify({ username: this.user, password: this.pass });
+            var link = 'http://104.248.176.189:8001/rest-auth/login/';
+            var credentials = JSON.stringify({ "email": "javier@gmail.com", "password": "lalaland2222" });
             this.presentLoadingCustom();
             try {
-                this.http.post(link, credentials)
+                this.http.post(link, credentials, options)
                     .subscribe(function (data) {
+                    //this.data.response = data["_body"]; 
+                    console.log(data);
                     _this.data.response = data["_body"];
                     var resp = JSON.parse(_this.data.response);
-                    //alert(resp['id'])
-                    //alert(resp['response'])
-                    if (resp['response'] == "200") {
-                        window.localStorage.setItem("user", String(_this.user));
-                        window.localStorage.setItem("pass", String(_this.pass));
-                        window.localStorage.setItem("id_doctor", String(resp['id']));
-                        _this.exitoLogin();
-                    }
-                    else {
-                        _this.errorLogin();
-                        //this.exitoLogin();
-                    }
+                    //alert(JSON.stringify(resp))
+                    /*
+                                if(resp['response'] == "200"){
+                                  window.localStorage.setItem("user", String(this.user));
+                                  window.localStorage.setItem("pass", String(this.pass));
+                                  window.localStorage.setItem("id_doctor", String(resp['id']));
+                                  this.exitoLogin();
+                                }else{
+                                  this.errorLogin();
+                                  //this.exitoLogin();
+                                }
+                    */
+                    window.localStorage.setItem("user", String(_this.user));
+                    window.localStorage.setItem("pass", String(_this.pass));
+                    //let id_doctor = String(resp['user']['id']);
+                    var key = String(resp['key']);
+                    //alert(key)
+                    window.localStorage.setItem("id_doctor", key);
+                    _this.exitoLogin();
                 }, function (error) {
+                    alert(error);
                     console.log("Oooops!");
                     _this.loading.dismiss();
-                    alert("No se pudieron enviar los datos\nIntentelo mas tarde");
+                    //alert("No se pudieron enviar los datos\nIntentelo mas tarde");        
+                    _this.errorLogin();
                 });
             }
             catch (error) {
+                console.log("Catch: " + error);
                 alert("Hay un error en el servidor");
             }
         }
@@ -184,7 +197,7 @@ var LoginPage = /** @class */ (function () {
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
             selector: 'page-login',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/login/login.html"*/'<ion-toolbar color="primary" class="centrado"><img src="img/logo-header.png" class="headerlogo">\n</ion-toolbar>\n<ion-content text-center>\n\n  <img src="img/doctor_logo.png" width="50%" class="margin" />\n  <ion-list>    \n      <ion-item>\n        <ion-label floating>Usuario</ion-label>\n        <ion-input type="text" [(ngModel)]="user"></ion-input>\n      </ion-item>\n    \n      <ion-item>        \n        <ion-label floating>Contraseña</ion-label>\n        <ion-input [type]="passwordType" [(ngModel)]="pass"></ion-input>\n        <!--<ion-icon name="eye" color="primary" item-end (click)="mostrarPassword()"></ion-icon>-->\n\n        <button ion-button clear item-end large [color]="passwordShowed === true ? \'primary\' : \'danger\'" (click)="mostrarPassword()">\n          <ion-icon name="eye"></ion-icon>\n        </button>        \n      </ion-item>        \n      \n        <p></p>\n\n    </ion-list>\n    \n<!--\n    <button ion-button outline item-end icon-left color="gris" (click)="registrarse()">Registrarse <br>\n    <ion-icon name="md-create"></ion-icon>\n  </button>\n-->\n\n    <button ion-button outline item-end icon-left  color="Primary" (click)="login()">Ingresar <br><!-- loguear -->\n        <ion-icon name="person"></ion-icon>\n    </button>\n<!--\n    <button ion-button outline item-end icon-left  color="Primary" (click)="mostrarPassword()">Mostrar contraseña\n      <ion-icon name="eye"></ion-icon>\n  </button>\n-->        \n<!--\n<ion-fab right bottom >\n  <button ion-fab >\n      <ion-icon name="md-calendar" large></ion-icon>\n   </button>\n   <ion-fab-list side="top"> \n    <button class="option" ion-fab><ion-icon name="md-remove"></ion-icon><ion-label>Eliminar cita</ion-label></button>\n    <button class="option" ion-fab><ion-icon name="md-add"></ion-icon><ion-label>Agregar cita</ion-label></button>\n    <button class="option" ion-fab><ion-icon name="md-refresh"></ion-icon><ion-label>Actualizar cita</ion-label></button>\n  </ion-fab-list>\n</ion-fab>\n-->\n\n\n\n</ion-content>\n\n<ion-footer>\n  \n  <ion-toolbar id="daatlab" color="primary"><span>POWERED BY:</span> <img src="img/daatlab-footer.png">\n  </ion-toolbar>\n</ion-footer>\n\n'/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/login/login.html"*/,
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_2__angular_http__["a" /* Http */]])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */]])
     ], LoginPage);
     return LoginPage;
 }());
@@ -254,7 +267,7 @@ module.exports = webpackAsyncContext;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return HomePage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__providers_database_database__ = __webpack_require__(158);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_background_mode__ = __webpack_require__(82);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_native_audio__ = __webpack_require__(161);
@@ -281,6 +294,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
+//Archivo donde estan las funciones: /wp-content/plugins/bkcom/classes/bup.complement.profile.class.php
+//Linea 27 donde esta declarada la funcion bup_check_adm_availability_sfaff
+//1483 esta mejor explicado
 var HomePage = /** @class */ (function () {
     function HomePage(modal, uniqueDeviceID, loadingCtrl, plt, localNotifications, nativeAudio, backgroundMode, navCtrl, http, alertCtrl, database) {
         var _this = this;
@@ -492,54 +509,72 @@ var HomePage = /** @class */ (function () {
     /**************************************************************************************************************/
     HomePage.prototype.consultarHorariosBDremota2 = function () {
         var _this = this;
-        if (window.localStorage.getItem("id_doctor") != undefined) {
-            console.log("Estado notificacion recibida: " + localStorage.getItem("NotificacionRecibida"));
-            //alert("Se haran cambios en la base local por que se detectó una notificacion") 
-            //      var link = 'http://93.104.215.239/ecg_mqtt/DATABASE/agendaMedicos.php';
-            var link = 'https://topmedic.com.mx/accessDatabase/wp_DB/service/recibirDatos.php';
-            var id_medico = JSON.stringify({ id_medico: window.localStorage.getItem("id_doctor") });
-            this.http.post(link, id_medico)
+        var headers = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', 'Token ' + window.localStorage.getItem("id_doctor")); //Aqui se agrega el key del medico obtenido del login
+        var options = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["d" /* RequestOptions */]({ headers: headers });
+        //alert(JSON.stringify(options))
+        console.log("Estado notificacion recibida: " + localStorage.getItem("NotificacionRecibida"));
+        var link = 'http://104.248.176.189:8001/api/v1/patients/';
+        var id_medico = JSON.stringify({ id_medico: window.localStorage.getItem("id_doctor") });
+        this.http.get(link, options)
+            .subscribe(function (data) {
+            _this.data.response = data["_body"];
+            _this.resp = JSON.parse(_this.data.response);
+            //alert(JSON.stringify(this.resp))
+            //alert(JSON.stringify(this.resp['results']))
+            console.log(JSON.stringify(_this.resp));
+            //Aqui recuperaremos todas las citas de cada medico
+            var link2 = 'http://104.248.176.189:8001/api/v1/schedule/';
+            _this.http.get(link2, options)
                 .subscribe(function (data) {
                 _this.data.response = data["_body"];
                 _this.resp = JSON.parse(_this.data.response);
-                //alert(this.resp['respValue'])
-                if (_this.resp['respValue'] == "200") {
-                    _this.horarios_medico = JSON.stringify(_this.resp['horarios']);
-                    _this.numeroFilas = JSON.stringify(_this.resp['numFilas']);
-                    console.log("Resultado consulta: " + JSON.stringify(_this.resp));
-                    window.localStorage.setItem("numFilasDBActual", _this.numeroFilas);
-                    //alert("LocalStorageXD: "+window.localStorage.getItem("numFilasDBremota")+" numberFilas:"+this.numeroFilas)
-                    //Limpiamos la BD local para poder insertar los nuevos valores de la BD remota
-                    //alert("Hay datos nuevos que agregar ")
-                    _this.isPainted = false;
-                    _this.eventsCalendar.splice(0, _this.eventsCalendar.length); //Vaciar el arreglo que contiene los elementos a pintar en el calendario
-                    _this.clearTable();
-                    //alert("Estado notificacion: "+localStorage.getItem("NotificacionRecibida"))
-                    if (localStorage.getItem("NotificacionRecibida") == "1") {
-                        //alert("Ha llegado una notificacion!")
-                        _this.lanzarNotificacion();
-                    }
-                    //this.playAudio(); //Esta funcion la utilizabamos antes de usar las notificaciones
-                    localStorage.setItem("NotificacionRecibida", "0");
-                }
-                else if (_this.resp['respValue'] == "400") {
-                    _this.loading.dismiss();
-                    _this.clearCalendar();
-                    if (localStorage.getItem("alertDatosConsultadosLanzada") == "0") {
-                        alert("No hay citas disponibles");
-                        _this.clearCalendar();
-                    }
-                    localStorage.setItem("alertDatosConsultadosLanzada", "1");
-                }
+                alert(JSON.stringify(_this.resp));
+                alert(JSON.stringify(_this.resp['results']));
+                console.log(JSON.stringify(_this.resp));
+                _this.horarios_medico = JSON.stringify(_this.resp['results']); //Datos de usuarios
+                _this.numeroFilas = JSON.stringify(_this.resp['count']);
+                console.log("Resultado consulta: " + JSON.stringify(_this.resp));
+                window.localStorage.setItem("numFilasDBActual", _this.numeroFilas);
             }, function (error) {
-                console.log("Oooops!");
-                alert("No se pudieron enviar los datos\nIntentelo mas tarde");
+                alert("XD No se pudieron obtener las citas :(");
             });
+            //                 if(this.resp['respValue'] == "200" ){
+            _this.horarios_medico = JSON.stringify(_this.resp['results']); //Datos de usuarios
+            _this.numeroFilas = JSON.stringify(_this.resp['count']);
+            console.log("Resultado consulta: " + JSON.stringify(_this.resp));
+            window.localStorage.setItem("numFilasDBActual", _this.numeroFilas);
+            //alert("LocalStorageXD: "+window.localStorage.getItem("numFilasDBremota")+" numberFilas:"+this.numeroFilas)
+            //Limpiamos la BD local para poder insertar los nuevos valores de la BD remota
+            //alert("Hay datos nuevos que agregar ")
+            _this.isPainted = false;
+            _this.eventsCalendar.splice(0, _this.eventsCalendar.length); //Vaciar el arreglo que contiene los elementos a pintar en el calendario
+            _this.clearTable();
+            //alert("Estado notificacion: "+localStorage.getItem("NotificacionRecibida"))
+            if (localStorage.getItem("NotificacionRecibida") == "1") {
+                //alert("Ha llegado una notificacion!")
+                _this.lanzarNotificacion();
+            }
+            //this.playAudio(); //Esta funcion la utilizabamos antes de usar las notificaciones
             localStorage.setItem("NotificacionRecibida", "0");
-        }
-        else {
-            alert("El doctor no tiene un  ID asignado");
-        }
+            //               }else if(this.resp['respValue'] == "400"){
+            /*
+            this.loading.dismiss();
+            this.clearCalendar()
+            if(localStorage.getItem("alertDatosConsultadosLanzada") == "0"){
+              alert("No hay citas disponibles")
+              this.clearCalendar()
+            }
+            localStorage.setItem("alertDatosConsultadosLanzada","1")
+
+          }
+*/
+        }, function (error) {
+            console.log("Oooops!");
+            alert("XD No se pudieron enviar los datos\nIntentelo mas tarde");
+        });
+        localStorage.setItem("NotificacionRecibida", "0");
     };
     HomePage.prototype.clearCalendar = function () {
         //alert("Tam de arrayCitas: "+this.eventsCalendar.length)
@@ -945,7 +980,7 @@ var HomePage = /** @class */ (function () {
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
             selector: 'page-home',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/home/home.html"*/'<ion-header>\n  <ion-navbar color="primary">\n      <ion-title>{{viewTitle}}</ion-title>\n      <ion-buttons end>\n          <!--<button ion-button (click)="loadEvents()">Load</button>-->\n          <!--<button ion-button (click)="clearCalendar()">Clear</button>-->\n          \n          <button ion-button [disabled]="isToday" (click)="today()">Hoy</button>\n          <button ion-button (click)="changeMode(\'month\')">M</button>\n          <button ion-button (click)="changeMode(\'week\')">S</button>\n          <button ion-button (click)="changeMode(\'day\')">D</button>\n       \n      </ion-buttons>\n  </ion-navbar>\n</ion-header>\n\n<ion-content class="has-header">\n  <calendar [eventSource]="eventSource"\n            [calendarMode]="calendar.mode"\n            [currentDate]="calendar.currentDate"\n            [locale]="calendar.locale"\n            \n            (onCurrentDateChanged)="onCurrentDateChanged($event)"\n            (onEventSelected)="onEventSelected($event)"\n            (onTitleChanged)="onViewTitleChanged($event)"\n            (onTimeSelected)="onTimeSelected($event)"\n            step="30">\n  </calendar>    \n\n  <!-- <button ion-button block (click)="createUser();"> Crear usuario</button>\n  <button ion-button block secondary round (click)="updateCalendar1();"> update Calendar OPC 1</button> \n  <button ion-button block round (click)="updateCalendar2();"> update Calendar OPC 2</button>\n  \n  <button ion-button block color="tem" round (click)="updateCalendar3();"> update Calendar OPC 3</button>\n\n  <button ion-button block (click)="consultarHorariosBDremota();"> Consultar horarios BD remota</button>\n\n  \n  <button ion-button block (click)="clearTable();"> Vaciar base de datos</button>\n  \n  <button ion-button block color="sec" (click)="getCitas();"> Obtener citas de la BD</button>\n  \n  <button ion-button (click)="playAudio()">Play audio</button>\n  \n  <button ion-button (click)="lanzarNotificacion()">Lanzar notificacion</button>\n  <button ion-button (click)="lanzarNotificacion2()">Lanzar notificacion 2</button>\n-->\n  \n<ion-fab right bottom #fab >\n    <button ion-fab (click)="actualizarAgenda()">\n        <ion-icon name="md-refresh" large></ion-icon>\n        <!-- <ion-img src="img/update2.png"></ion-img> -->\n     </button>\n  </ion-fab>\n\n  \n  <ion-fab left bottom #fab >\n    <button ion-fab (click)="agregarCita()">\n        <ion-icon name="md-add" large></ion-icon>\n     </button>\n\n  </ion-fab>\n\n</ion-content>\n\n'/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/home/home.html"*/
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* ModalController */], __WEBPACK_IMPORTED_MODULE_8__ionic_native_unique_device_id__["a" /* UniqueDeviceID */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_6__ionic_native_local_notifications__["a" /* LocalNotifications */], __WEBPACK_IMPORTED_MODULE_5__ionic_native_native_audio__["a" /* NativeAudio */], __WEBPACK_IMPORTED_MODULE_4__ionic_native_background_mode__["a" /* BackgroundMode */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_2__angular_http__["a" /* Http */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_3__providers_database_database__["a" /* DatabaseProvider */]])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* ModalController */], __WEBPACK_IMPORTED_MODULE_8__ionic_native_unique_device_id__["a" /* UniqueDeviceID */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_6__ionic_native_local_notifications__["a" /* LocalNotifications */], __WEBPACK_IMPORTED_MODULE_5__ionic_native_native_audio__["a" /* NativeAudio */], __WEBPACK_IMPORTED_MODULE_4__ionic_native_background_mode__["a" /* BackgroundMode */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_3__providers_database_database__["a" /* DatabaseProvider */]])
     ], HomePage);
     return HomePage;
 }());
@@ -989,7 +1024,9 @@ var DatabaseProvider = /** @class */ (function () {
             this.storage = new __WEBPACK_IMPORTED_MODULE_1__ionic_native_sqlite__["a" /* SQLite */]();
             this.storage.create({ name: "topmedic02.db", location: "default" }).then(function (db) {
                 _this.db = db;
-                db.executeSql("CREATE TABLE IF NOT EXISTS horarios (id INTEGER PRIMARY KEY AUTOINCREMENT, fecha_consulta text, hora text, horb text, descripcion text, link_token text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []);
+                db.executeSql("CREATE TABLE IF NOT EXISTS datosPaciente (id INTEGER PRIMARY KEY AUTOINCREMENT, fecha_consulta text, hora text, horb text, descripcion text, link_token text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []).then(function () {
+                    db.executeSql("CREATE TABLE IF NOT EXISTS horarios (id INTEGER PRIMARY KEY AUTOINCREMENT, fecha_consulta text, hora text, horb text, descripcion text, link_token text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []);
+                }).catch(function (err) { return console.log("error detected creating tables", err); });
                 _this.isOpen = true;
             }).catch(function (error) {
                 console.log(error);
@@ -1119,11 +1156,42 @@ var DatabaseProvider = /** @class */ (function () {
             });
         });
     };
+    /***********************************************************************************************************/
+    /***********************************************************************************************************/
+    /***********************************************************************************************************/
+    /***************************** Funciones para almacenar datos la primera vez *******************************/
+    /***********************************************************************************************************/
+    DatabaseProvider.prototype.almacenarHorariosCitasEnBD = function (id, fecha_consulta, hora, horb, Doctor, numCitas) {
+        var _this = this;
+        console.log("Desde funcion de almacenamiento: \nId: " + id + " \nFecha: " + fecha_consulta + " \nHora: " + hora + " " + " \nHora Fin: " + horb + " \nDoctor: " + Doctor + " \nnumCitas: " + numCitas + "");
+        return new Promise(function (resolve, reject) {
+            var sql = "INSERT INTO horarios (id,fecha_consulta, hora, horb, Doctor) VALUES (?, ?, ?, ?, ?)";
+            _this.db.executeSql(sql, [id, fecha_consulta, hora, horb, Doctor]).then(function (data) {
+                //Aqui iba el resolve  
+                //alert("Duda: "+data)
+                //console.log("Duda CONVERTIDA: "+JSON.stringify(data))
+            }, function (error) {
+                //alert("Insert db function: "+JSON.stringify(error))
+                reject(error);
+            });
+            _this.contador++;
+            resolve(_this.contador);
+            if (_this.contador == numCitas) {
+                //alert("Contador local: "+this.contador+" \nParametro: "+numCitas)        
+                //alert("Se reiniciara el contador a 0")
+                _this.contador = 0;
+            }
+            else {
+            }
+            //      resolve(this.contador);     
+        });
+    };
     DatabaseProvider = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["B" /* Injectable */])(),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__ionic_native_sqlite__["a" /* SQLite */]])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__ionic_native_sqlite__["a" /* SQLite */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__ionic_native_sqlite__["a" /* SQLite */]) === "function" && _a || Object])
     ], DatabaseProvider);
     return DatabaseProvider;
+    var _a;
 }());
 
 //# sourceMappingURL=database.js.map
@@ -1225,7 +1293,7 @@ Object(__WEBPACK_IMPORTED_MODULE_0__angular_platform_browser_dynamic__["a" /* pl
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__pages_modificar_cita_modificar_cita__ = __webpack_require__(206);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__pages_crear_cita_crear_cita__ = __webpack_require__(104);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_ionic2_calendar__ = __webpack_require__(282);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__angular_http__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__angular_http__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__providers_database_database__ = __webpack_require__(158);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ionic_native_sqlite__ = __webpack_require__(159);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__ionic_native_background_mode__ = __webpack_require__(82);
@@ -1277,7 +1345,7 @@ var AppModule = /** @class */ (function () {
             imports: [
                 __WEBPACK_IMPORTED_MODULE_10_ionic2_calendar__["a" /* NgCalendarModule */],
                 __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["a" /* BrowserModule */],
-                __WEBPACK_IMPORTED_MODULE_11__angular_http__["b" /* HttpModule */],
+                __WEBPACK_IMPORTED_MODULE_11__angular_http__["c" /* HttpModule */],
                 __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["d" /* IonicModule */].forRoot(__WEBPACK_IMPORTED_MODULE_5__app_component__["a" /* MyApp */], {
                     scrollPadding: false,
                     scrollAssist: true,

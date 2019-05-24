@@ -4,6 +4,7 @@ import { AlertController } from 'ionic-angular';
 import {Http, Headers } from '@angular/http';
 import { HomePage } from '../home/home'
 import { LoadingController } from 'ionic-angular';
+import { RequestOptions } from '@angular/http';
 
 /**
  * Generated class for the LoginPage page.
@@ -17,6 +18,9 @@ import { LoadingController } from 'ionic-angular';
   selector: 'page-login',
   templateUrl: 'login.html',
 })
+
+
+
 export class LoginPage {
   data:any = {};
 
@@ -25,7 +29,7 @@ export class LoginPage {
   loading:any;
   passwordType:string='password';
   passwordShowed:boolean=false;
-
+  options:any;
   
 
 
@@ -33,7 +37,6 @@ export class LoginPage {
     this.data.username = '';
     this.data.response = '';    
     this.http = http;
-
   }
 
   ionViewDidLoad() {
@@ -101,31 +104,33 @@ export class LoginPage {
 
 
   login(){    
-         
 
+    const headers = new Headers()
+    headers.append('Content-Type','application/json')
+
+    let options = new RequestOptions({ headers: headers });
+    
     if(this.user != "" && this.pass != "")
     {
       
-      //alert("boton presionado!")
-//      var link = 'http://93.104.215.239/ecg_mqtt/DATABASE/agendaMedicos.php';
-//      var link = 'https://topmedic.com.mx/accessDatabase/AgendaTopMedicos/agendaMedicos.php';     
-      var link = 'https://topmedic.com.mx/accessDatabase/wp_DB/service/recibirDatos.php';            
-      var credentials = JSON.stringify({username: this.user,password:this.pass});
+      var link = 'http://104.248.176.189:8001/rest-auth/login/';
+      var credentials = JSON.stringify({"email":"javier@gmail.com","password":"lalaland2222"});
+         
       this.presentLoadingCustom();
       
       try {
-      
 
-      this.http.post(link, credentials)                  
+      this.http.post(link, credentials,options)                  
       .subscribe(data => {
         
-
+        //this.data.response = data["_body"]; 
+        console.log(data)
         this.data.response = data["_body"]; 
-
         var resp = JSON.parse(this.data.response);
-        //alert(resp['id'])
-        //alert(resp['response'])
         
+            //alert(JSON.stringify(resp))
+
+/*
             if(resp['response'] == "200"){
               window.localStorage.setItem("user", String(this.user));  
               window.localStorage.setItem("pass", String(this.pass));  
@@ -135,13 +140,25 @@ export class LoginPage {
               this.errorLogin();               
               //this.exitoLogin();
             }
+*/
+            window.localStorage.setItem("user", String(this.user));  
+            window.localStorage.setItem("pass", String(this.pass));  
+            //let id_doctor = String(resp['user']['id']);
+            let key = String(resp['key']);
+            //alert(key)
+            window.localStorage.setItem("id_doctor", key);  
+            this.exitoLogin();  
+
         }, error => {
+          alert(error)
           console.log("Oooops!");
           this.loading.dismiss(); 
-          alert("No se pudieron enviar los datos\nIntentelo mas tarde");          
+          //alert("No se pudieron enviar los datos\nIntentelo mas tarde");        
+          this.errorLogin();    
         });
 
       } catch (error) {
+        console.log("Catch: "+error)
         alert("Hay un error en el servidor")
       }
 
