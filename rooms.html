@@ -1,0 +1,760 @@
+<html>
+  <head>
+    <title>Boton Medico</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="erizo.js"></script>
+    <!--<script type="text/javascript" src="script.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <!--script para mostrar alert despues de un cierto tiempo -->
+    <script type="text/javascript">
+
+
+      var slowLoad = window.setTimeout( function() {
+         alert( "Su ancho de banda no es optimo, la videoconsulta podria presentar errores" );
+      }, 300); //Si no carga la pagina en menos de 300 ms probablemente el internet es muy lento
+
+
+      window.addEventListener( 'load', function(event) {
+        //alert("Evento: "+event)
+        window.clearTimeout( slowLoad );
+      }, false );
+
+    </script>
+  </head>
+
+  <body>    
+    <center>
+      <div class="pantallaLogo init">
+        <img border="0" alt="icon.png" src="assets/icon.png"  width="100%" height="100%" id="imgLogoInicio">
+        <p id="textoEsperando">Esperando respuesta del otro participante...</p>
+      </div>
+      </div>
+        <p id="msgReconectar" style="display: none;">Presione <a href="dispositivosx://" id="linkRetry">aqui</a> si desea reiniciar la videoconsulta PC</p>
+        <p id="msgReconectarCellphone" style="display: none;">Presione <a href="dispositivosx://" id="linkRetryCellphone">aqui</a> si desea reiniciar la videoconsulta Android</p>         
+      </div>
+    </center>
+
+<!--*********************************************************************-->
+<!--******************************** cronometro *************************-->
+<!--*********************************************************************-->
+
+<div id="contenedor" style="display: none;">
+    <div class="reloj" id="Horas">00</div>
+    <div class="reloj" id="Minutos">:00</div>
+    <div class="reloj" id="Segundos">:00</div>
+    <div class="reloj" id="Centesimas">:00</div>
+<!--    
+    <input type="button" class="boton" id="inicio" value="inicio &#9658;" onclick="inicio();">
+    <input type="button" class="boton" id="parar" value="parar &#8718;" onclick="parar();" disabled>
+    <input type="button" class="boton" id="continuar" value="inicioC &#8634;" onclick="inicio();" disabled>
+    <input type="button" class="boton" id="reinicio" value="reinicio &#8635;" onclick="reinicio();" disabled>
+
+-->
+
+
+  </div>
+
+<!--
+<div id="contenedor2">
+  <div class="nameUser" id="nameUser">Usuario: </div>
+</div>  
+-->
+
+
+  <!--*********************************************************************-->
+  <!--*********************************************************************-->
+  <!--*********************************************************************-->
+
+
+
+
+
+
+
+    <div id="videoContainer" class="pantallaCompleta"></div>
+
+    <center>
+
+<ul id="social_side_links">
+  <li>    
+  	  
+<!--
+      <a href="" id="botonSalir"><img border="0" src="colgar.png" width="75" height="75"  id="imgColgar"/></a>
+-->
+
+      <img border="0" src="colgar.png" width="75" height="75" onClick="history.go(-1);return true;" id="imgColgar"/>
+
+      <a href="dispositivos://" id="linkDispositivos"><img border="0" src="assets/esteto.png"  width="75" height="75" id="imgEsteto" /></a>
+  		 
+
+      <img border="0" src="assets/volume3.1.png" width="75" height="75" onClick="checkStatusAudio()" id="audioConsulta"/>
+
+<!--
+      <img border="0" src="assets/volume3.1.png" class="sonido_desactivado" width="75" height="75" onClick="unmuteAudio()" id="escuchar"/>
+-->
+
+
+
+  </li>  
+</ul>
+
+</center>
+
+
+
+<script type="text/javascript">
+
+  
+//setTimeout("alert('setTimeOut')",5000)
+//setTimeout('windowCloseXD()',10000)
+
+function windowCloseXD(){
+alert("alerta del setTimeOut demo")
+//windowClose()
+window.close()
+}
+
+
+document.getElementById('linkRetry').addEventListener('click',function(e){
+    e.preventDefault();
+    urlSavedLS = localStorage.getItem('urlSaved')
+    windowClose()
+})
+
+document.getElementById('linkRetryCellphone').addEventListener('click',function(e){
+    e.preventDefault();
+    //urlSavedLS = localStorage.getItem('urlSaved')
+    //windowClose()
+    window.history.back();
+
+})
+
+
+
+function retryVideoCall(){
+
+}
+
+
+jQuery(function(){
+  $('#my_imgXD').click(function(){
+    alert("Entrando JQuery")
+    console.log("Entrando JQuery")
+  })
+})
+
+
+function redirigirPagina(){
+  //window.history.back();
+  alert("Entrando!!!")
+  window.location = "https://usuarios.botonmedico.com/elegir-medico/"
+}
+
+///////////////////////////////////////////////////////////////////////
+
+
+
+function windowBackCellphone(){
+    window.history.back()
+} 
+
+		 
+function windowClose(){
+	open(urlSavedLS,'_self','').close();
+
+//  window.create({"url":urlSavedLS,"incognito":true})
+//alert("Enter to windowCLosssssse function")
+	return false;
+}	
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// Hacer visible solo para dispositivos moviles ////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+function isMovilOrWeb(){
+  var device = navigator.userAgent
+
+  if (device.match(/Iphone/i)|| device.match(/Ipod/i)|| device.match(/Android/i)|| device.match(/J2ME/i)|| device.match(/BlackBerry/i)|| device.match(/iPhone|iPad|iPod/i)|| device.match(/Opera Mini/i)|| device.match(/IEMobile/i)|| device.match(/Mobile/i)|| device.match(/Windows Phone/i)|| device.match(/windows mobile/i)|| device.match(/windows ce/i)|| device.match(/webOS/i)|| device.match(/palm/i)|| device.match(/bada/i)|| device.match(/series60/i)|| device.match(/nokia/i)|| device.match(/symbian/i)|| device.match(/HTC/i))
+  { 
+
+  //alert("Estoy dentro de un navegador en un dispositivo movil")
+  //Con esto haremos que sea visible en dispositivos moviles pero no los de endoscopio o estetoscopio
+  return 1
+  }
+  else
+  {
+  //alert("Estoy dentro de un navegador web")
+  return 0//0
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////// Funcion para mutear Audio ////////////////////////////////
+function checkStatusAudio() {  
+
+    var elemButtonAudio = document.getElementById('audioConsulta')
+    var classVolumeButton = document.getElementById('audioConsulta').className
+    //alert("Clase: "+classVolumeButton)
+
+    if(classVolumeButton == "sonido_activado"){
+        muteAudio()
+        elemButtonAudio.src = "assets/mute3.1.png"
+        elemButtonAudio.className = "sonido_desactivado"
+    }else if(classVolumeButton == "sonido_desactivado"){
+        unmuteAudio()
+        elemButtonAudio.src = "assets/volume3.1.png"
+        elemButtonAudio.className = "sonido_activado"
+    }
+
+
+    if(classVolumeButton == ""){
+        elemButtonAudio.className = "sonido_desactivado"  
+        muteAudio()      
+        elemButtonAudio.src = "assets/mute3.1.png"        
+    }
+
+      
+}//fin function 
+///////////////////////////////////////////////////////////////////////////////////
+////////////////////// Funcion para mutear Audio ////////////////////////////////
+function muteAudio() {  
+  //alert("Entrando a la funcion muteAudio")
+    localStream.muteAudio(true,function(result){})
+
+}//fin function muteAudio()
+///////////////////////////////////////////////////////////////////////////////////
+////////////////////// Funcion para desmutear audio ////////////////////////////////
+function unmuteAudio() {  
+  //alert("Entrando a la funcion unmuteAudio")
+    localStream.muteAudio(false,function(result){})
+}//fin function muteAudio()
+///////////////////////////////////////////////////////////////////////////////////
+
+
+document.getElementById("imgColgar").style.visibility="hidden";
+//document.getElementById("imgEndo").style.visibility="hidden";
+document.getElementById("imgEsteto").style.visibility="hidden";
+document.getElementById("audioConsulta").style.visibility="hidden";
+
+
+/* globals Erizo */
+'use strict';
+var serverUrl = '/';
+var localStream, roomX, recording, recordingId,dimAncho,dimAlto;
+var urlSaved = "";
+var urlSavedLS = "";
+
+dimAncho = screen.width;
+dimAlto = screen.height;
+var banderaTmin = 0;
+function getParameterByName(name) {
+  name = name.replace(/[\[]/, '\\\[').replace(/[\]]/, '\\\]');
+  var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
+      results = regex.exec(location.search);
+  return results == null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+var roomName = getParameterByName('roomName')|| 'roomDraLucy';
+//var roomName = getParameterByName('room') || 'roomDraLucy';
+console.log("roomDoctor: "+roomName);
+//alert(roomName)
+
+var idUsuario = getParameterByName('idUsuario');
+console.log("idUsuario: "+idUsuario);
+
+var email = getParameterByName('email');
+console.log("email: "+email);
+
+////////////////////////// Funcion toggleSlideShowMode() //////////////////////////
+var slideShowMode = false;
+
+function toggleSlideShowMode() {  // jshint ignore:line
+  var streams = roomX.remoteStreams;
+  var cb = function (evt){
+      console.log('SlideShowMode changed', evt);
+  };
+  slideShowMode = !slideShowMode;
+  for (var index in streams) {
+    var stream = streams[index];
+    if (localStream.getID() !== stream.getID()) {
+      console.log('Updating config');
+      stream.updateConfiguration({slideShowMode: slideShowMode}, cb);
+    }//fin if
+  }//fin for
+}//fin toggleSlideShowMode()
+///////////////////////////////////////////////////////////////////////////////////
+function checarEstadoRoom(){
+  var stateRoom  = roomX.state
+  var remoteStream = roomX.remoteStreams
+  var localStream = roomX.localStreams
+  var roomID = roomX.roomID
+
+  console.log("Estado: "+stateRoom)
+  console.log("remoteStreams: "+remoteStream)
+  console.log("localStreams: "+localStream)
+  console.log("roomID: "+roomID)
+}
+////////////////////// Funcion para la grabacion ////////////////////////////////
+function startRecording () {  // jshint ignore:line  
+  if (roomX !== undefined){
+    console.log("CONtenido de roomX: "+roomX)
+    if (!recording){
+        roomX.startRecording(localStream, function(id) {
+        recording = true;
+        recordingId = id;
+
+		console.log("ESTAMOS GRABANDO TODO...");
+      });//room.startRecording(localStream, function(id) {
+    } else {
+      roomX.stopRecording(recordingId);
+      recording = false;
+    }//fin del else
+  }//if (room !== undefined){
+}//fin function startRecording () 
+///////////////////////////////////////////////////////////////////////////////////
+function salirDeVideollamada(){
+  //alert("Han pasado 10 segundos");
+  alert("Entrando a funcion salir")
+  window.history.back();  
+}
+///////////////////////////////////////////////////////////////////////////////////
+
+$("botonSalir").click(function(){
+  alert("Entrando jQuery")
+})
+
+///////////////////////////////////////////////////////////////////////////////////
+
+function passEmail(){
+  document.getElementById("linkDispositivos").setAttribute("href", "intencion://email="+localStorage.getItem("correo")+""); 
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+
+////////////////// Esto es lo que se va a cargar de inicio ////////////////////////
+      window.onload = function () {
+
+        if(isMovilOrWeb() == 1){
+            var msgReconectarCellphone = document.getElementById('msgReconectarCellphone')
+            msgReconectarCellphone.style.display = 'block'
+        }else{
+          var msgReconectarPC = document.getElementById('msgReconectar')
+          msgReconectarPC.style.display = 'block'
+        }
+        
+        urlSaved = window.location;
+
+        localStorage.setItem("urlSaved",window.location)
+        console.log("urlSaved: "+localStorage.getItem("urlSaved"))
+
+
+        localStorage.setItem("correo",email)
+        console.log("correo: "+localStorage.getItem("correo"))
+
+        passEmail()
+        
+
+        //setTimeout("window.history.replaceState({},'','videollamada')",2000)
+        window.history.replaceState({},'','videollamada');
+        console.log("urlSaved: "+localStorage.getItem("urlSaved"))
+        recording = false;
+          var screen = getParameterByName('screen');
+          //var roomName = getParameterByName('room') || 'basicExampleRoom';//linea original
+          //var roomName = getParameterByName('room') || 'p2p';
+          
+
+
+      var roomType = getParameterByName('type') || 'erizo';//linea original
+      //var roomType = getParameterByName('type') || 'p2p';
+      var onlySubscribe = getParameterByName('onlySubscribe');
+      console.log('Selected Room', roomName, 'of type', roomType);
+
+    var config = {audio: true,
+                video: true,
+                data: true,
+                screen: screen,                
+                videoSize: [640, 480, 640, 480],
+//                videoSize: [640, 480, 1280, 720],                
+                //videoSize: [640, 480, 960, 540],
+                videoFrameRate: [10, 20]};
+
+//                videoFrameRate: [25, 30]};
+
+
+    console.log("Ancho: "+dimAncho+"\n Alto"+dimAlto);
+  
+    if (screen){
+        //config.extensionId = 'okeephmleflklcdebijnponpabbmmgeo';
+    }
+
+    localStream = Erizo.Stream(config);//Inicializacion del stream con los valores de config
+/////////////////////////////fUNCION PARA CREAR EL TOKEN//////////////////////////////
+        var createToken = function(roomData, callback) {
+
+          var req = new XMLHttpRequest();
+          var url = serverUrl + 'createToken/';
+          //alert("DIR: "+serverUrl);
+          req.onreadystatechange = function () {
+            if (req.readyState === 4) {
+	             callback(req.responseText);
+            }
+          };
+
+          req.open('POST', url, true);
+          req.setRequestHeader('Content-Type', 'application/json');
+          req.send(JSON.stringify(roomData));
+
+        };//Fin var createToken = function(roomData, callback)
+      ///////////////////////////////////////////////////////////////////////////////////////////////
+
+        //var roomData  = {username: 'user', role: 'presenter', room: roomName, type: roomType};
+        //var roomData  = {username: 'DraLucy', role: 'presenter', room: roomName, type: roomType};
+        var roomData  = {username: idUsuario+"_"+email, role: 'presenter', room: roomName, type: roomType};
+
+        createToken(roomData, function (response) {//El token de usuario necesita un nombre y un rol
+          var token = response;//aSIGNACION A LA VARIABLE TOKEN EL TOKEN GENERADO POR EL SERVIDOR, este token siempre es distinto y permite agregar un nuevo participante a un room
+          //console.log("token generado: "+token+"\n");
+
+          roomX = Erizo.Room({token: token});//Aqui se creará el objeto room pasando el token que estos usuarios han recibido previamente de su servicio. Este token tiene que recuperarse utilizando la API del servidor , ya que es un token de acceso de usuario.
+
+          var subscribeToStreams = function (streams) {
+              var cb = function (evt){
+                console.log('Bandwidth Alert', evt.msg, evt.bandwidth);
+              };      
+              for (var index in streams) {
+              var stream = streams[index];
+              if (localStream.getID() !== stream.getID()) {
+                roomX.subscribe(stream, {slideShowMode: slideShowMode, metadata: {type: 'subscriber'}});
+                stream.addEventListener('bandwidth-alert', cb);
+              }
+            }//Fin for
+
+          };//FIn var subscribeToStreams
+
+/*
+          navigator.getUserMedia = (navigator.getUserMedia ||
+          navigator.webkitGetUserMedia ||
+          navigator.mozGetUserMedia ||
+          navigator.msGetUserMedia);
+
+          if (navigator.getUserMedia) {
+            navigator.getUserMedia({  
+              audio: true,
+              video: true
+            },
+            
+            function(stream) {
+              // returns true if any tracks have active state of true
+              var result = stream.getVideoTracks().some(function(track) {
+              return track.enabled && track.readyState === 'live';
+            });
+
+            if (result) {
+                alert('Your webcam is busy!');
+              } else {
+                alert('Not busy');
+              }
+            },
+            
+            function(e) {alert("Error: " + e.name);});
+
+          }
+*/          
+
+          roomX.addEventListener('room-connected', function (roomEvent) {
+
+            var options = {metadata: {type: 'publisher'}, maxVideoBW: 100000, minVideoBW: 1000, scheme:"notify-break-recover"};//Por defecto el minimo son 300
+            var enableSimulcast = getParameterByName('simulcast');
+            if (enableSimulcast) options.simulcast = {numSpatialLayers: 2};
+
+            if (!onlySubscribe) roomX.publish(localStream, options);
+            subscribeToStreams(roomEvent.streams);
+
+
+/*
+            roomX.publish(localStream, {maxVideoBW: 5000, minVideoBW: 1000}, function(id,error){
+
+              if(id === undefined){
+                console.log("Error publicando Streaming", error);
+              }else{
+                console.log("Streaming pubicado con exitoso", id);
+              }              
+            });
+*/
+
+
+          });//FIn de room.addEventListener
+
+
+
+          roomX.addEventListener('stream-subscribed', function(streamEvent) {
+            document.getElementById("contenedor").style.display="block";
+	    inicio()
+
+      //document.getElementById("nameUser").innerHTML="Usuario: "+idUsuario;
+
+
+            var stream = streamEvent.stream;
+            var div = document.createElement('div');
+            //streaming cliente opuesto
+            div.setAttribute('style', 'width: '+(dimAncho)+'px; height: '+(dimAlto)+'px;');//Ajustamos al tamanno de pantalla de el dispositivo en el que se use
+            div.setAttribute('id', 'test' + stream.getID());
+            document.getElementById('videoContainer').appendChild(div);
+            stream.show('test' + stream.getID());
+            console.log('test del ID->'+stream.getID+"FIN");
+
+            //$('#msgReconectar').fadeOut();
+            //Fucion para grabar videoconsulta
+window.setTimeout('startRecording()',10000);
+            //window.setTimeout('salirDeVideollamada()',10000);
+            document.getElementById("imgColgar").style.visibility="visible";
+
+	    document.getElementById("textoEsperando").style.visibility="hidden";
+	    document.getElementById("imgLogoInicio").style.visibility="hidden";
+
+            
+
+            if(isMovilOrWeb() == 1){//esta en navegador movil      
+              //document.getElementById("imgEndo").style.visibility="visible";
+              document.getElementById("imgEsteto").style.visibility="visible";
+
+
+            }else{
+              //document.getElementById("imgColgar").style.visibility="hidden";
+              //document.getElementById("imgEndo").style.visibility="hidden";
+              document.getElementById("imgEsteto").style.visibility="hidden";
+              document.getElementById("audioConsulta").style.visibility="visible";
+            }      
+          });//Fin de room.addEventListener
+
+
+
+          roomX.addEventListener('stream-added', function (streamEvent) {
+            var streams = [];
+            streams.push(streamEvent.stream);
+            subscribeToStreams(streams);
+            console.log("Entrando streaming del cliente: (stream-added)"+idUsuario)//No garantiza que se ve la camara del cliente      
+          });//Fin de room.addEventListener
+
+          function permanecerosalir(){
+
+            swal({
+              title: "Videoconsulta terminada",
+              text: "Desea continuar aqui para reintentar conexion?",
+              icon: "warning",
+              buttons: true,
+              //showConfirmButton:true,              
+              buttons: ["Permanecer aqui", "Salir"],
+              //confirmButtonColor:'#16a316',
+              dangerMode: true,
+            })
+            .then((salir) => {
+              if (salir) {
+                swal("Saliendo...!", {
+                  icon: "success",
+                });
+                //window.open('','_parent','');                
+                //window.close();
+                window.history.back();
+              } else {
+                //swal("Aqui permanecemos en la sala!");
+              }
+            });  
+
+          }
+
+
+          roomX.addEventListener('stream-removed', function (streamEvent) {
+          // Remove stream from DOM
+          var stream = streamEvent.stream;
+            if (stream.elementID !== undefined) {
+                var element = document.getElementById(stream.elementID);
+                document.getElementById('videoContainer').removeChild(element);
+                document.getElementById("imgColgar").style.visibility="hidden";
+                //document.getElementById("imgEndo").style.visibility="hidden";
+                document.getElementById("imgEsteto").style.visibility="hidden";
+                document.getElementById("audioConsulta").style.visibility="hidden";
+                //window.history.back();//DEscomentar para salirse cuando se remueva el streaming
+            }//Fin if
+            //alert("Stream Removido")
+            console.log("Stream removido")
+            //window.history.back();//DEscomentar para salirse cuando se remueva el streaming
+
+            roomX.stopRecording(recordingId);
+            recording = false;
+            console.log("Deteniendo grabacion stream removido...")
+	    reinicio()
+            permanecerosalir()
+
+          });//Fin de room.addEventListener
+
+          roomX.addEventListener('stream-failed', function (){
+	    reinicio()
+            console.log('Stream Failed, act accordingly');
+            alert("No se pudo establecer conexion");
+            document.getElementById("imgColgar").style.visibility="hidden";
+            //document.getElementById("imgEndo").style.visibility="hidden";
+            document.getElementById("imgEsteto").style.visibility="hidden";
+            document.getElementById("audioConsulta").style.visibility="hidden";
+            window.history.back();
+          });//Fin de room.addEventListener
+
+          if (onlySubscribe) {
+              roomX.connect();
+              //document.getElementById("imgColgar").style.visibility="visible";
+          } else {
+
+            //CHecar el estado de la room
+            //setInterval(checarEstadoRoom,1000)
+
+            var div = document.createElement('div');
+            //div.setAttribute('style', 'width: 320px; height: 240px; ');
+            div.setAttribute('style', 'width: '+(dimAncho/5)+'px; height: '+(dimAlto/5)+'px;');//ventna local del webrtc
+            //div.setAttribute('style', 'width: 1; height: 1; float:left');//LO ponemos a 1px por que no 
+            div.setAttribute('id', 'myVideo');
+            document.getElementById('videoContainer').appendChild(div);            
+
+
+            localStream.addEventListener('access-accepted', function () {//Detector de eventos para saber cuando el usuario permite el acceso a camara y microfono
+              roomX.connect();
+              localStream.show('myVideo');//ESto muestra el streaming local en pantalla             
+            });//Fin localStream.addEventListener
+
+
+            localStream.addEventListener('access-denied', function () {//Detector de eventos para saber cuando el usuario       deniega el acceso a camara y microfono
+              //roomX.connect();
+              //localStream.show('myVideo');//
+                window.close();
+              alert("No se dieron permisos de camara y microfono , vuelta a intentarlo");
+            });//Fin localStream.addEventListener
+
+
+            localStream.init();//Inicializamos el stream
+          }//FIn else 
+
+        });
+      };
+
+/******************************************************************************/
+/********************************** cronometro ********************************/
+/******************************************************************************/
+
+var centesimas = 0;
+var segundos = 0;
+var minutos = 0;
+var horas = 0;
+var control = "";
+function inicio () {
+  control = setInterval(cronometro,10);
+//  document.getElementById("inicio").disabled = true;
+//  document.getElementById("parar").disabled = false;
+//  document.getElementById("continuar").disabled = true;
+//  document.getElementById("reinicio").disabled = false;
+//Las lineas anteriormente comentadas solo se usaran si se quiere usar los botones fisicos
+}
+function parar () {
+  clearInterval(control);
+  document.getElementById("parar").disabled = true;
+  document.getElementById("continuar").disabled = false;
+}
+function reinicio () {
+  clearInterval(control);
+  centesimas = 0;
+  segundos = 0;
+  minutos = 0;
+  horas = 0;
+  Centesimas.innerHTML = ":00";
+  Segundos.innerHTML = ":00";
+  Minutos.innerHTML = ":00";
+  Horas.innerHTML = "00";
+//  document.getElementById("inicio").disabled = false;
+//  document.getElementById("parar").disabled = true;
+//  document.getElementById("continuar").disabled = true;
+//  document.getElementById("reinicio").disabled = true;
+//DEscomentar las lineas anteriores si se quiere usar los botones
+}
+function cronometro () {
+  if (centesimas < 99) {
+    centesimas++;
+    if (centesimas < 10) { centesimas = "0"+centesimas }
+    Centesimas.innerHTML = ":"+centesimas;
+  }
+  if (centesimas == 99) {
+    centesimas = -1;
+  }
+  if (centesimas == 0) {
+    segundos ++;
+    if (segundos < 10) { segundos = "0"+segundos }
+    Segundos.innerHTML = ":"+segundos;
+  }
+  if (segundos == 59) {
+    segundos = -1;
+  }
+  if ( (centesimas == 0)&&(segundos == 0) ) {
+    minutos++;
+    if (minutos < 10) { minutos = "0"+minutos }
+    Minutos.innerHTML = ":"+minutos;
+	//Colores de acuerdo al tiempo que esten conectados
+if(minutos > 0 && minutos < 15){
+ document.getElementById("Horas").style.color = "green";
+ document.getElementById("Minutos").style.color = "green";
+ document.getElementById("Segundos").style.color = "green";
+ document.getElementById("Centesimas").style.color = "green";
+ document.getElementById("Segundos").style.color = "green";
+}else if(minutos >= 15 && minutos < 18){
+ document.getElementById("Horas").style.color = "yellow";
+ document.getElementById("Minutos").style.color = "yellow";
+ document.getElementById("Segundos").style.color = "yellow";
+ document.getElementById("Centesimas").style.color = "yellow";
+ document.getElementById("Segundos").style.color = "yellow";
+}else if(minutos >= 18 && minutos < 20){
+ document.getElementById("Horas").style.color = "red";
+ document.getElementById("Minutos").style.color = "red";
+ document.getElementById("Segundos").style.color = "red";
+ document.getElementById("Centesimas").style.color = "red";
+ document.getElementById("Segundos").style.color = "red";
+
+    if(banderaTmin == 0){
+      //alert("Los 20 minutos limite estan por terminar")
+
+            swal({
+              title: "Videoconsulta al limite",
+              text: "Los 20 minutos limite de videoconsulta estan por terminar",
+              icon: "warning",
+              dangerMode: true,
+            });  
+
+      banderaTmin = 1;
+    }
+
+}else if(minutos >= 20){
+    //salirDeVideollamada()
+    //window.history.back();  
+    window.history.go(-2)
+
+
+}
+
+
+  }
+  if (minutos == 59) {
+    minutos = -1;
+  }
+  if ( (centesimas == 0)&&(segundos == 0)&&(minutos == 0) ) {
+    horas ++;
+    if (horas < 10) { horas = "0"+horas }
+    Horas.innerHTML = horas;
+  }
+}
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+
+    </script>
+  </body>
+
+</html>
+

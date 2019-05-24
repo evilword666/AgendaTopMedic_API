@@ -1,0 +1,53 @@
+
+
+//Clonar proyecto
+git clone https://github.com/evilword666/AgendaTopMedic.git
+
+
+//Dar permiso a todo el proyecto con el comando:
+sudo chmod -R  777 AgendaTopMedic/
+
+//Desinstalar/Eliminar el plugin de las notificaciones push de los archivos config.xml y package.json
+
+//Movernos al proyecto e instalar los modulos de node
+sudo npm i --force
+
+//Solucion a errores de sass 
+
+sudo npm install -g --unsafe-perm --verbose @angular/cli
+sudo npm install --save-dev  --unsafe-perm node-sass
+
+
+//Compilar app ionic en xcode 10
+sudo ionic cordova build ios -- --buildFlag="-UseModernBuildSystem=0"
+
+
+//Desinstalar plugin de notificaciones push
+sudo cordova plugin remove phonegap-plugin-push --force
+
+
+//Installar push plugin ionic
+sudo ionic cordova plugin add phonegap-plugin-push --variable SENDER_ID=1056846874683
+sudo npm install @ionic-native/push@4.20.0
+
+
+
+//Remover Carpeta y subcarpetas
+sudo rm -r AgendaTopMedic/
+
+EN CASO DE SER NECESARIO FORZAR A QUE RECARGUE LOS ICONOS DE LAS PLATAFORMAS CREADAS
+ionic cordova resources --force
+
+//Si marca problemas con npm
+No. That's not an issue of debug package.
+I think it's related to NPM v3's changed installation behavior.
+
+You can resolve that issue by following methods:
+
+Ensure dependencies described correctly on package.json
+Just type npm install and hit Enter.
+Check issue still exists. and If issue not resolved, continue these methods.
+type npm cache clean and hit Enter
+type sudo npm install -g npm and hit Enter.
+Retry npm install and hit Enter.
+if issue not resolved even tried these methods, Please reply with your Node.js version, NPM version, Operating System, and package.json which is using.

@@ -1,0 +1,50 @@
+
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Modificar Cita</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content text-center>
+
+
+  <ion-list> 
+    <ion-item>
+      <ion-label floating>Fecha de inicio</ion-label>
+      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoInicioCita"></ion-datetime>
+    </ion-item>
+  
+    <ion-item>        
+      <ion-label floating>Fecha de fin</ion-label>
+      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoFinCita"></ion-datetime>     
+    </ion-item>        
+    
+    <ion-item>
+      <ion-label>Tipo de consulta: </ion-label>
+      <ion-select [(ngModel)]="tipoConsulta" multiple="false">
+        <ion-option>Presencial</ion-option>
+        <ion-option>Video-Asistencia</ion-option>
+      </ion-select>
+    </ion-item>
+
+      <ion-item>
+        <ion-label floating>Descripcion</ion-label>
+        <ion-input type="text" [(ngModel)]="descripcion"></ion-input>
+      </ion-item>
+
+      <p></p>
+  
+  </ion-list>
+  
+  <button ion-button outline item-end icon-left  color="Primary" (click)="cancelar()">Aceptar <br>
+    
+  </button>
+
+  <button ion-button outline item-end icon-left  color="Primary" (click)="cancelar()">Cancelar <br>
+   
+  </button>
+
+</ion-content>

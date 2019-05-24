@@ -1,0 +1,51 @@
+page-login {
+    
+
+
+#welcome{
+    background:color($colors,energy);
+    font-size: 52px;
+    margin-top: 70;
+}
+
+.margin{
+    margin-top: 25%;
+}
+
+#loadingbar{
+    height:100%;
+    width:100%;
+}
+
+button[ion-fab] {
+    overflow: visible;
+    position: relative;
+
+    
+    ion-label {
+        position: absolute;
+        top: -8px;
+        right: 40px;
+
+        color: white;
+        background-color: rgba(0,0,0,0.7);
+        line-height: 24px;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+}
+
+.fab{
+    contain: layout;
+}
+
+
+.option {
+    background-color: rgb(114, 166, 233);
+    text-align: center;
+    overflow: visible;
+}
+
+
+
+}
