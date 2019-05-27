@@ -515,7 +515,8 @@ var HomePage = /** @class */ (function () {
         var options = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["d" /* RequestOptions */]({ headers: headers });
         //alert(JSON.stringify(options))
         console.log("Estado notificacion recibida: " + localStorage.getItem("NotificacionRecibida"));
-        var link = 'http://104.248.176.189:8001/api/v1/patients/';
+        //var link = 'http://104.248.176.189:8001/api/v1/patients/';
+        var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/citas/';
         var id_medico = JSON.stringify({ id_medico: window.localStorage.getItem("id_doctor") });
         this.http.get(link, options)
             .subscribe(function (data) {
@@ -524,22 +525,6 @@ var HomePage = /** @class */ (function () {
             //alert(JSON.stringify(this.resp))
             //alert(JSON.stringify(this.resp['results']))
             console.log(JSON.stringify(_this.resp));
-            //Aqui recuperaremos todas las citas de cada medico
-            var link2 = 'http://104.248.176.189:8001/api/v1/schedule/';
-            _this.http.get(link2, options)
-                .subscribe(function (data) {
-                _this.data.response = data["_body"];
-                _this.resp = JSON.parse(_this.data.response);
-                alert(JSON.stringify(_this.resp));
-                alert(JSON.stringify(_this.resp['results']));
-                console.log(JSON.stringify(_this.resp));
-                _this.horarios_medico = JSON.stringify(_this.resp['results']); //Datos de usuarios
-                _this.numeroFilas = JSON.stringify(_this.resp['count']);
-                console.log("Resultado consulta: " + JSON.stringify(_this.resp));
-                window.localStorage.setItem("numFilasDBActual", _this.numeroFilas);
-            }, function (error) {
-                alert("XD No se pudieron obtener las citas :(");
-            });
             //                 if(this.resp['respValue'] == "200" ){
             _this.horarios_medico = JSON.stringify(_this.resp['results']); //Datos de usuarios
             _this.numeroFilas = JSON.stringify(_this.resp['count']);
@@ -572,7 +557,7 @@ var HomePage = /** @class */ (function () {
 */
         }, function (error) {
             console.log("Oooops!");
-            alert("XD No se pudieron enviar los datos\nIntentelo mas tarde");
+            alert("XD No se pudieron enviar los datos\nIntentelo mas tarde: ->" + error);
         });
         localStorage.setItem("NotificacionRecibida", "0");
     };
@@ -620,9 +605,9 @@ var HomePage = /** @class */ (function () {
     /**************************************************************************************************************/
     /**************************************************************************************************************/
     /**************************************************************************************************************/
-    HomePage.prototype.almacenarHorariosEnLocalBD = function (fecha_consulta, hora, horb, descripcion, link_token, tipo_servicio, booking_id, edad_paciente, Sexo, padecimiento, nombre_completo_paciente, numCitas) {
+    HomePage.prototype.almacenarHorariosEnLocalBD = function (id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat, tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno, apellido_materno, sexo, edad, numCitas) {
         var _this = this;
-        this.database.almacenarCitasEnBD(fecha_consulta, hora, horb, descripcion, link_token, tipo_servicio, booking_id, edad_paciente, Sexo, padecimiento, nombre_completo_paciente, numCitas).then(function (data) {
+        this.database.almacenarCitasEnBD(id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat, tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno, apellido_materno, sexo, edad, numCitas).then(function (data) {
             //console.log(JSON.stringify("Numero de datos insertados: "+data))
             if (JSON.stringify(data) == numCitas + "") {
                 //alert("Se agregaron todas las citas de la BD remota a la DB local")
@@ -732,47 +717,46 @@ var HomePage = /** @class */ (function () {
         if (this.horarios_medico != undefined) {
             var resp2 = JSON.parse(this.horarios_medico);
             var nFilas = JSON.parse(this.numeroFilas);
-            //alert("Se agregaran "+nFilas+" nuevas filas")
-            if (this.resp['respValue'] == "200") {
-                for (var i = 0; i < Object.keys(resp2).length; i++) {
-                    var element = this.resp['horarios'][i];
-                    var fecha_consulta = JSON.stringify(element['fecha_consulta']);
-                    var hora = JSON.stringify(element['hora']);
-                    var horb = JSON.stringify(element['horb']);
-                    var descripcion = JSON.stringify(element['descripcion']);
-                    var link_token = JSON.stringify(element['token']);
-                    var nombre = JSON.stringify(element['nombre_paciente']);
-                    var aPaterno = JSON.stringify(element['paterno']);
-                    var tipo_servicio = JSON.stringify(element['tipo_servicio']);
-                    var booking_id = JSON.stringify(element['booking_id']);
-                    var edad_paciente = JSON.stringify(element['edad_paciente']);
-                    var Sexo = JSON.stringify(element['Sexo']);
-                    var padecimiento = JSON.stringify(element['padecimiento']);
-                    var fecha_consulta_SC = fecha_consulta.replace(/"/g, '');
-                    var hora_SC = hora.replace(/"/g, '');
-                    var horb_SC = horb.replace(/"/g, '');
-                    var descripcion_SC = descripcion.replace(/"/g, '');
-                    var tipo_servicio_SC = tipo_servicio.replace(/"/g, '');
-                    var nombre_SC = nombre.replace(/"/g, '');
-                    var aPaterno_SC = aPaterno.replace(/"/g, '');
-                    var link_token_SC = link_token.replace(/"/g, '');
-                    var booking_id_SC = booking_id.replace(/"/g, '');
-                    var edad_paciente_SC = edad_paciente.replace(/"/g, '');
-                    var Sexo_SC = Sexo.replace(/"/g, '');
-                    var padecimiento_SC = padecimiento.replace(/"/g, '');
-                    var nombre_completo_paciente = nombre_SC + " " + aPaterno_SC;
-                    var descripcionCompuesta = descripcion_SC;
-                    //var descripcionCompuesta = "Cita con "+nombre_SC+" "+aPaterno_SC+" "+descripcion_SC; 
-                    //alert(" "+nombre_SC+" "+aPaterno_SC+" "+" "+aMaterno_SC);
-                    //this.eventSource es el evento en el html que se ira refrescando 
-                    //this.eventSource = this.addSchedules(fecha_consulta_SC, hora_SC, horb_SC, descripcion_SC);
-                    this.almacenarHorariosEnLocalBD(fecha_consulta_SC, hora_SC, horb_SC, descripcionCompuesta, link_token_SC, tipo_servicio_SC, booking_id_SC, edad_paciente_SC, Sexo_SC, padecimiento_SC, nombre_completo_paciente, nFilas);
-                }
-                window.localStorage.setItem("numFilasDBremota", window.localStorage.getItem("numFilasDBActual"));
+            alert("Se agregaran " + nFilas + " nuevas filas\nElementos: " + JSON.stringify(resp2));
+            //        if(this.resp['respValue'] == "200"){
+            for (var i = 0; i < Object.keys(resp2).length; i++) {
+                var element = this.resp['results'][i];
+                alert("Elemento " + i + ":\n " + JSON.stringify(element));
+                var id_cita = JSON.stringify(element['id']);
+                var fecha_cita = JSON.stringify(element['fecha_cita']);
+                var hora_inicio = JSON.stringify(element['hora_inicio']);
+                var hora_final = JSON.stringify(element['hora_final']);
+                var enlace_videochat = JSON.stringify(element['enlace_videochat']);
+                var tipo_servicio = JSON.stringify(element['tipo_servicio']);
+                var descripcion = JSON.stringify(element['descripcion']);
+                var antecedentes_principales = JSON.stringify(element['antecedentes_principales']);
+                var id_paciente = JSON.stringify(element['Paciente']['id_paciente']);
+                var nombre = JSON.stringify(element['Paciente']['nombre']);
+                var apellido_paterno = JSON.stringify(element['Paciente']['apellido_paterno']);
+                var apellido_materno = JSON.stringify(element['Paciente']['apellido_materno']);
+                var sexo = JSON.stringify(element['Paciente']['sexo']);
+                var edad = JSON.stringify(element['Paciente']['edad']);
+                alert("Elemento " + i + ":\n " + element);
+                var id_cita_SC = id_cita.replace(/"/g, '');
+                var fecha_cita_SC = fecha_cita.replace(/"/g, '');
+                var hora_inicio_SC = hora_inicio.replace(/"/g, '');
+                var hora_final_SC = hora_final.replace(/"/g, '');
+                var enlace_videochat_SC = enlace_videochat.replace(/"/g, '');
+                var tipo_servicio_SC = tipo_servicio.replace(/"/g, '');
+                var descripcion_SC = descripcion.replace(/"/g, '');
+                var antecedentes_principales_SC = antecedentes_principales.replace(/"/g, '');
+                var id_paciente_SC = id_paciente.replace(/"/g, '');
+                var nombre_SC = nombre.replace(/"/g, '');
+                var apellido_paterno_SC = apellido_paterno.replace(/"/g, '');
+                var apellido_materno_SC = apellido_materno.replace(/"/g, '');
+                var sexo_SC = sexo.replace(/"/g, '');
+                var edad_SC = edad.replace(/"/g, '');
+                this.almacenarHorariosEnLocalBD(id_cita_SC, fecha_cita_SC, hora_inicio_SC, hora_final_SC, enlace_videochat_SC, tipo_servicio_SC, descripcion_SC, antecedentes_principales_SC, id_paciente_SC, nombre_SC, apellido_paterno_SC, apellido_materno_SC, sexo_SC, edad_SC, nFilas);
             }
-            else {
-                alert("Hubo un error en la consulta de los horarios");
-            }
+            window.localStorage.setItem("numFilasDBremota", window.localStorage.getItem("numFilasDBActual"));
+            //        }else{
+            //        alert("Hubo un error en la consulta de los horarios")        
+            //        }
         }
     };
     /**************************************************************************************************************/
@@ -1022,31 +1006,42 @@ var DatabaseProvider = /** @class */ (function () {
         console.log('Hello DatabaseProvider Provider');
         if (!this.isOpen) {
             this.storage = new __WEBPACK_IMPORTED_MODULE_1__ionic_native_sqlite__["a" /* SQLite */]();
-            this.storage.create({ name: "topmedic02.db", location: "default" }).then(function (db) {
+            this.storage.create({ name: "topmedic10.db", location: "default" }).then(function (db) {
                 _this.db = db;
-                db.executeSql("CREATE TABLE IF NOT EXISTS datosPaciente (id INTEGER PRIMARY KEY AUTOINCREMENT, fecha_consulta text, hora text, horb text, descripcion text, link_token text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []).then(function () {
-                    db.executeSql("CREATE TABLE IF NOT EXISTS horarios (id INTEGER PRIMARY KEY AUTOINCREMENT, fecha_consulta text, hora text, horb text, descripcion text, link_token text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []);
-                }).catch(function (err) { return console.log("error detected creating tables", err); });
+                /*
+                        db.executeSql("CREATE TABLE IF NOT EXISTS tb_datos_Pacientes (id INTEGER PRIMARY KEY AUTOINCREMENT, fecha_consulta text, hora text, horb text, descripcion text, link_token text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []).then(()=>{
+                            db.executeSql("CREATE TABLE IF NOT EXISTS tb_citas_pacientes (id INTEGER PRIMARY KEY AUTOINCREMENT, id_T text, fecha_cita text, titulo text, descripcion text, hora_inicio text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []).then(()=>{
+                                db.executeSql("CREATE TABLE IF NOT EXISTS tb_servicios_medicos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_T text, fecha_cita text, titulo text, descripcion text, hora_inicio text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []).then(()=>{
+                                    db.executeSql("CREATE TABLE IF NOT EXISTS tb_horarios_medicos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_T text, fecha_cita text, titulo text, descripcion text, hora_inicio text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []).then(()=>{
+                                    }).catch((err)=>console.log("Error al tratar de crear la tabla tb_horarios_medicos", err));
+                                }).catch((err)=>console.log("Error al tratar de crear la tabla tb_servicios_medicos", err));
+                            }).catch((err)=>console.log("Error al tratar de crear la tabla tb_citas_pacientes", err));
+                        }).catch((err)=>console.log("Error al crear la tabla tb_datos_Pacientes", err));
+                */
+                db.executeSql("CREATE TABLE IF NOT EXISTS tb_datos_citas_pacientes (id INTEGER PRIMARY KEY AUTOINCREMENT, id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text)", []).then(function () {
+                    console.log("Tabla tb_citas_medicos creada exitosamente!");
+                }).catch(function (err) { return console.log("Error al tratar de crear la tabla tb_horarios_medicos", err); });
                 _this.isOpen = true;
             }).catch(function (error) {
-                console.log(error);
+                console.log("Error en la BD: " + error);
             });
         }
     }
     /***********************************************************************************************************/
     /***************************** Funciones para almacenar datos la primera vez *******************************/
     /***********************************************************************************************************/
-    DatabaseProvider.prototype.almacenarCitasEnBD = function (fecha_consulta, hora, horb, descripcion, link_token, tipo_servicio, booking_id, edad_paciente, Sexo, padecimiento, nombre_completo_paciente, numCitas) {
+    DatabaseProvider.prototype.almacenarCitasEnBD = function (id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat, tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno, apellido_materno, sexo, edad, numCitas) {
         var _this = this;
-        console.log("Desde funcion de almacenamiento: \nFecha: " + fecha_consulta + " \nHora: " + hora + " " + " \nHora Fin: " + horb + " \nDescripcion: " + descripcion + " \nlink_token: " + link_token + "\ntipo_servicio: " + tipo_servicio + "booking_id: " + booking_id + " edad_paciente: " + edad_paciente + " Sexo: " + Sexo + " padecimiento: " + padecimiento + " nombre_completo_paciente: " + nombre_completo_paciente);
+        console.log("Desde funcion de almacenamiento: \nid_cita: " + id_cita + " \nfecha_cita: " + fecha_cita + " " + " \nhora_inicio: " + hora_inicio + " \nhora_final: " + hora_final + " \nenlace_videochat: " + enlace_videochat + "\ntipo_servicio: " + tipo_servicio + "\ndescripcion: " + descripcion + " \nantecedentes_principales: " + antecedentes_principales + " \nid_paciente: " + id_paciente + " \nnombre: " + nombre + " \napellido_paterno: " + apellido_paterno + "  \napellido_materno: " + apellido_materno + "   \nsexo: " + sexo + "   \nedad: " + edad + " ");
         return new Promise(function (resolve, reject) {
-            var sql = "INSERT INTO horarios (fecha_consulta, hora, horb, descripcion, link_token,tipo_servicio,booking_id,edad_paciente,Sexo,padecimiento,nombre_completo_paciente) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            _this.db.executeSql(sql, [fecha_consulta, hora, horb, descripcion, link_token, tipo_servicio, booking_id, edad_paciente, Sexo, padecimiento, nombre_completo_paciente]).then(function (data) {
+            //id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text   
+            var sql = "INSERT INTO tb_datos_citas_pacientes (fecha_consulta, hora, horb, descripcion, link_token,tipo_servicio,booking_id,edad_paciente,Sexo,padecimiento,nombre_completo_paciente) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            _this.db.executeSql(sql, [id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat, tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno, apellido_materno, sexo, edad]).then(function (data) {
                 //Aqui iba el resolve  
                 //alert("Duda: "+data)
                 //console.log("Duda CONVERTIDA: "+JSON.stringify(data))
             }, function (error) {
-                //alert("Insert db function: "+JSON.stringify(error))
+                alert("Insert db function: " + JSON.stringify(error));
                 reject(error);
             });
             _this.contador++;
@@ -1064,24 +1059,33 @@ var DatabaseProvider = /** @class */ (function () {
     DatabaseProvider.prototype.obtenerCitas = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this.db.executeSql("SELECT * FROM horarios", []).then(function (data) {
+            _this.db.executeSql("SELECT * FROM tb_datos_citas_pacientes", []).then(function (data) {
                 //alert("Numero de filas de consulta: "+data.rows.length)
                 var arrayUsers = [];
                 if (data.rows.length > 0) {
                     for (var i = 0; i < data.rows.length; i++) {
                         arrayUsers.push({
-                            id: data.rows.item(i).id,
-                            fecha_consulta: data.rows.item(i).fecha_consulta,
-                            hora: data.rows.item(i).hora,
-                            horb: data.rows.item(i).horb,
+                            id_cita: data.rows.item(i).id_cita,
+                            fecha_cita: data.rows.item(i).fecha_cita,
+                            hora_inicio: data.rows.item(i).hora_inicio,
+                            hora_final: data.rows.item(i).hora_final,
+                            enlace_videochat: data.rows.item(i).enlace_videochat,
+                            tipo_servicio: data.rows.item(i).tipo_servicio,
                             descripcion: data.rows.item(i).descripcion,
+                            antecedentes_principales: data.rows.item(i).antecedentes_principales,
+                            id_paciente: data.rows.item(i).id_paciente,
+                            nombre: data.rows.item(i).nombre,
+                            apellido_paterno: data.rows.item(i).apellido_paterno,
+                            apellido_materno: data.rows.item(i).apellido_materno,
+                            sexo: data.rows.item(i).sexo,
+                            edad: data.rows.item(i).edad
                         });
                     }
                 }
                 //alert(arrayUsers)
                 resolve(arrayUsers);
             }, function (error) {
-                //alert(error)
+                alert(error);
                 reject(error);
             });
         });
@@ -1130,23 +1134,25 @@ var DatabaseProvider = /** @class */ (function () {
     DatabaseProvider.prototype.limpiarTabla = function () {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this.db.executeSql("DELETE FROM horarios", []).then(function (data) {
+            _this.db.executeSql("DELETE FROM tb_datos_citas_pacientes", []).then(function (data) {
                 var arrayUsers = [];
                 if (data.rows.length > 0) {
                     for (var i = 0; i < data.rows.length; i++) {
                         arrayUsers.push({
-                            id: data.rows.item(i).id,
-                            fecha_consulta: data.rows.item(i).fecha_consulta,
-                            hora: data.rows.item(i).hora,
-                            horb: data.rows.item(i).horb,
-                            descripcion: data.rows.item(i).descripcion,
-                            link_token: data.rows.item(i).link_token,
+                            id_cita: data.rows.item(i).id_cita,
+                            fecha_cita: data.rows.item(i).fecha_cita,
+                            hora_inicio: data.rows.item(i).hora_inicio,
+                            hora_final: data.rows.item(i).hora_final,
+                            enlace_videochat: data.rows.item(i).enlace_videochat,
                             tipo_servicio: data.rows.item(i).tipo_servicio,
-                            booking_id: data.rows.item(i).booking_id,
-                            edad_paciente: data.rows.item(i).edad_paciente,
-                            Sexo: data.rows.item(i).Sexo,
-                            padecimiento: data.rows.item(i).padecimiento,
-                            nombre_completo_paciente: data.rows.item(i).nombre_completo_paciente
+                            descripcion: data.rows.item(i).descripcion,
+                            antecedentes_principales: data.rows.item(i).antecedentes_principales,
+                            id_paciente: data.rows.item(i).id_paciente,
+                            nombre: data.rows.item(i).nombre,
+                            apellido_paterno: data.rows.item(i).apellido_paterno,
+                            apellido_materno: data.rows.item(i).apellido_materno,
+                            sexo: data.rows.item(i).sexo,
+                            edad: data.rows.item(i).edad
                         });
                     }
                 }
@@ -1159,14 +1165,14 @@ var DatabaseProvider = /** @class */ (function () {
     /***********************************************************************************************************/
     /***********************************************************************************************************/
     /***********************************************************************************************************/
-    /***************************** Funciones para almacenar datos la primera vez *******************************/
+    /***************************** Funciones para almacenar tabla con datos obtenidos del API ******************/
     /***********************************************************************************************************/
-    DatabaseProvider.prototype.almacenarHorariosCitasEnBD = function (id, fecha_consulta, hora, horb, Doctor, numCitas) {
+    DatabaseProvider.prototype.almacenarHorariosCitasEnBDconAPI = function (id, fecha_cita, titulo, descripcion, hora_inicio, hora_final, color, sub_color, enlace_videochat, enlace_cita, status, Paciente, Doctor, numCitas) {
         var _this = this;
-        console.log("Desde funcion de almacenamiento: \nId: " + id + " \nFecha: " + fecha_consulta + " \nHora: " + hora + " " + " \nHora Fin: " + horb + " \nDoctor: " + Doctor + " \nnumCitas: " + numCitas + "");
+        console.log("Desde funcion de almacenamiento: \nId: " + id + " \fecha_cita: " + fecha_cita + " \titulo: " + titulo + " " + " \ndescripcion: " + descripcion + " \nhora_inicio: " + hora_inicio + " \nhora_final: " + hora_final + " \ncolor: " + color + " \nsub_color: " + sub_color + " \nenlace_videochat: " + enlace_videochat + " \nenlace_cita: " + enlace_cita + " \nstatus: " + status + " \nPaciente: " + Paciente + " \nDoctor: " + Doctor + " \nnumCitas: " + numCitas + "");
         return new Promise(function (resolve, reject) {
-            var sql = "INSERT INTO horarios (id,fecha_consulta, hora, horb, Doctor) VALUES (?, ?, ?, ?, ?)";
-            _this.db.executeSql(sql, [id, fecha_consulta, hora, horb, Doctor]).then(function (data) {
+            var sql = "INSERT INTO horarios_API (id,fecha_cita, titulo, descripcion, hora_inicio, hora_final, color, sub_color, enlace_videochat, enlace_cita, status, Paciente, Doctor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            _this.db.executeSql(sql, [id, fecha_cita, titulo, descripcion, hora_inicio, hora_final, color, sub_color, enlace_videochat, enlace_cita, status, Paciente, Doctor]).then(function (data) {
                 //Aqui iba el resolve  
                 //alert("Duda: "+data)
                 //console.log("Duda CONVERTIDA: "+JSON.stringify(data))
@@ -1186,12 +1192,39 @@ var DatabaseProvider = /** @class */ (function () {
             //      resolve(this.contador);     
         });
     };
+    /***********************************************************************************************************/
+    /************************** Funcion para obtener los datos de las consultas por usuario ********************/
+    /***********************************************************************************************************/
+    DatabaseProvider.prototype.obtenerCitasPorMedicoAPI = function () {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this.db.executeSql("SELECT * FROM horarios_API", []).then(function (data) {
+                //alert("Numero de filas de consulta: "+data.rows.length)
+                var arrayUsers = [];
+                if (data.rows.length > 0) {
+                    for (var i = 0; i < data.rows.length; i++) {
+                        arrayUsers.push({
+                            id: data.rows.item(i).id,
+                            fecha_consulta: data.rows.item(i).fecha_consulta,
+                            hora: data.rows.item(i).hora,
+                            horb: data.rows.item(i).horb,
+                            descripcion: data.rows.item(i).descripcion,
+                        });
+                    }
+                }
+                //alert(arrayUsers)
+                resolve(arrayUsers);
+            }, function (error) {
+                //alert(error)
+                reject(error);
+            });
+        });
+    };
     DatabaseProvider = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["B" /* Injectable */])(),
-        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__ionic_native_sqlite__["a" /* SQLite */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__ionic_native_sqlite__["a" /* SQLite */]) === "function" && _a || Object])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__ionic_native_sqlite__["a" /* SQLite */]])
     ], DatabaseProvider);
     return DatabaseProvider;
-    var _a;
 }());
 
 //# sourceMappingURL=database.js.map
