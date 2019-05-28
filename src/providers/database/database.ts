@@ -56,13 +56,14 @@ almacenarCitasEnBD(id_cita: string, fecha_cita:string, hora_inicio:string, hora_
 
     return new Promise ((resolve, reject) => {
       //id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text   
-      let sql = "INSERT INTO tb_datos_citas_pacientes (fecha_consulta, hora, horb, descripcion, link_token,tipo_servicio,booking_id,edad_paciente,Sexo,padecimiento,nombre_completo_paciente) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      //id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text)"
+      let sql = "INSERT INTO tb_datos_citas_pacientes (id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat,tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno,apellido_materno,sexo,edad) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       this.db.executeSql(sql, [id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat,tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno,apellido_materno,sexo,edad]).then((data) =>{
       //Aqui iba el resolve  
-        //alert("Duda: "+data)
+        //alert("Insercion correcta: "+data)
         //console.log("Duda CONVERTIDA: "+JSON.stringify(data))
       }, (error) => {
-        alert("Insert db function: "+JSON.stringify(error))
+        //alert("Insert db function: "+JSON.stringify(error))
         reject(error)
       });
       this.contador++; 
@@ -120,8 +121,9 @@ almacenarCitasEnBD(id_cita: string, fecha_cita:string, hora_inicio:string, hora_
 /***********************************************************************************************************/
 obtenerCamposCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,horaFinCitaSeleccionada){
   return new Promise ((resolve, reject) => {
-    //fecha_consulta text, hora text, horb text, descripcion text, link_token text
-    let query = "SELECT * FROM horarios WHERE fecha_consulta = ? AND hora = ? AND horb = ? ";
+     //id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text   
+
+    let query = "SELECT * FROM tb_datos_citas_pacientes WHERE fecha_cita = ? AND hora_inicio = ? AND hora_final = ? ";
     //alert(query)
       this.db.executeSql(query, [fechaCitaSeleccionada,horaInicioCitaSeleccionada,horaFinCitaSeleccionada]).then((data) => {
         
@@ -131,18 +133,20 @@ obtenerCamposCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,h
       if (data.rows.length > 0) {
         for (var i = 0; i < data.rows.length; i++) {
           arrayCamposCitaSeleccionada.push({
-            id: data.rows.item(i).id,
-            fecha_consulta: data.rows.item(i).fecha_consulta,
-            hora: data.rows.item(i).hora,
-            horb: data.rows.item(i).horb,
+            id_cita: data.rows.item(i).id_cita,
+            fecha_cita: data.rows.item(i).fecha_cita,
+            hora_inicio: data.rows.item(i).hora_inicio,
+            hora_final: data.rows.item(i).hora_final,
+            enlace_videochat: data.rows.item(i).enlace_videochat,
+            tipo_servicio: data.rows.item(i).tipo_servicio,
             descripcion: data.rows.item(i).descripcion,
-            link_token: data.rows.item(i).link_token,
-            tipo_servicio:data.rows.item(i).tipo_servicio,
-            booking_id: data.rows.item(i).booking_id,
-            edad_paciente: data.rows.item(i).edad_paciente,
-            Sexo: data.rows.item(i).Sexo,
-            padecimiento: data.rows.item(i).padecimiento,
-            nombre_completo_paciente: data.rows.item(i).nombre_completo_paciente
+            antecedentes_principales: data.rows.item(i).antecedentes_principales,
+            id_paciente: data.rows.item(i).id_paciente,
+            nombre: data.rows.item(i).nombre,
+            apellido_paterno: data.rows.item(i).apellido_paterno,
+            apellido_materno: data.rows.item(i).apellido_materno,
+            sexo: data.rows.item(i).sexo,
+            edad: data.rows.item(i).edad
           });            
         }          
       }

@@ -310,13 +310,22 @@ checarCambiosNotificacionesRecibidas(){
 //alert(JSON.stringify(this.resp))
 //alert(JSON.stringify(this.resp['results']))
 
-console.log(JSON.stringify(this.resp))
+//console.log(JSON.stringify(this.resp))
 
  //                 if(this.resp['respValue'] == "200" ){
                     
-                    this.horarios_medico = JSON.stringify(this.resp['results']);//Datos de usuarios
+                    //this.horarios_medico = this.resp['results'];//Datos de usuarios
+                    this.horarios_medico = this.resp;//Datos de usuarios
+
                     this.numeroFilas = JSON.stringify(this.resp['count']);
-                    console.log("Resultado consulta: "+JSON.stringify(this.resp))
+                    //alert(JSON.stringify(this.horarios_medico[0]['Paciente']['id']))
+                    //alert(JSON.stringify(this.horarios_medico[1]))
+                    //alert(JSON.stringify(this.horarios_medico[2]))
+                    console.log(this.horarios_medico['results']['Paciente'])
+                    //alert(Object.keys(this.horarios_medico['results']).length)
+                    //console.log("\n\nResultado consulta: "+JSON.stringify(this.horarios_medico))
+                    //console.log("\n\nResultado consulta[0]: "+JSON.stringify(this.horarios_medico[0]))
+                    //console.log("\n\nResultado consulta[1]: "+JSON.stringify(this.horarios_medico[1]))
                     window.localStorage.setItem("numFilasDBActual",this.numeroFilas)
                     //alert("LocalStorageXD: "+window.localStorage.getItem("numFilasDBremota")+" numberFilas:"+this.numeroFilas)
                                   
@@ -397,7 +406,7 @@ console.log(JSON.stringify(this.resp))
                     console.log("El token de las notificaciones push se ha actualizado en la BD")
                   }else{
                     //alert("No se pudieron insertar los datos :(")
-                    console.log("No se pudieron insertar los datos :(")
+                    console.log("No se pudo insertar el token :(")
                   }
                   
               }, error => {
@@ -418,7 +427,8 @@ console.log(JSON.stringify(this.resp))
 /**************************************************************************************************************/  
      
 almacenarHorariosEnLocalBD(id_cita: string, fecha_cita:string, hora_inicio:string, hora_final: string, enlace_videochat: string,tipo_servicio:string, descripcion:string, antecedentes_principales: string, id_paciente:string, nombre: string,apellido_paterno:string,apellido_materno:string, sexo:string, edad:string, numCitas:number ){
-    this.database.almacenarCitasEnBD(id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat,tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno,apellido_materno,sexo,edad, numCitas).then((data) =>{                
+ //alert("Entrando a la funcion de almacenamieto")
+  this.database.almacenarCitasEnBD(id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat,tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno,apellido_materno,sexo,edad, numCitas).then((data) =>{                
         //console.log(JSON.stringify("Numero de datos insertados: "+data))
         
         if(JSON.stringify(data) == numCitas+""){
@@ -427,7 +437,7 @@ almacenarHorariosEnLocalBD(id_cita: string, fecha_cita:string, hora_inicio:strin
         }
 
     },(error) => {
-        console.log("Error al crear usuario: "+error)
+        console.log("Error al alamacenar datos de consulta de API: "+error)
         //alert("xdxdxd: "+error)
         //alert("Error al crear: "+error)
     })
@@ -449,9 +459,9 @@ getCitas(){
             for (let i = 0; i < data.length; i++) {
                 const element = data[i];            
                 
-                let fecha_consulta_g = JSON.stringify(data[i]['fecha_consulta'])
-                let hora_g = JSON.stringify(data[i]['hora'])
-                let horb_g = JSON.stringify(data[i]['horb'])
+                let fecha_consulta_g = JSON.stringify(data[i]['fecha_cita'])
+                let hora_g = JSON.stringify(data[i]['hora_inicio'])
+                let horb_g = JSON.stringify(data[i]['hora_final'])
                 let descripcion_g = JSON.stringify(data[i]['descripcion'])
 
 
@@ -484,56 +494,64 @@ getCitas(){
 /**************************************************************************************************************/
 
 getDetallesCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,horaFinCitaSeleccionada){  
-  
+  //alert("Entrando a funcion para obtener campos de fecha seleccionada")
   //Usamos la funcion creada en el proveedor database.ts para obtener los datos de las citas
+  //alert("Fecha: "+fechaCitaSeleccionada+"\nInicio: "+horaInicioCitaSeleccionada+"\nFin: "+horaFinCitaSeleccionada)
   this.database.obtenerCamposCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,horaFinCitaSeleccionada).then((data: any) => {
     
 
           for (let i = 0; i < data.length; i++) {
               const element = data[i];            
               
-              let fecha_consulta_g = JSON.stringify(data[i]['fecha_consulta'])
-              let hora_g = JSON.stringify(data[i]['hora'])
-              let horb_g = JSON.stringify(data[i]['horb'])
-              let descripcion_g = JSON.stringify(data[i]['descripcion'])
-              let link_token_g = JSON.stringify(data[i]['link_token'])
-              let tipo_servicio_g = JSON.stringify(data[i]['tipo_servicio'])
+              var id_cita = JSON.stringify(element['id_cita'])
+              var fecha_cita = JSON.stringify(element['fecha_cita'])
+              var hora_inicio = JSON.stringify(element['hora_inicio'])
+              var hora_final = JSON.stringify(element['hora_final'])
+              var enlace_videochat = JSON.stringify(element['enlace_videochat'])
+              var tipo_servicio = JSON.stringify(element['tipo_servicio'])
+              var descripcion = JSON.stringify(element['descripcion'])
+              var antecedentes_principales = JSON.stringify(element['antecedentes_principales'])
+              var id_paciente = JSON.stringify(element['id_paciente'])
+              var nombre = JSON.stringify(element['nombre'])
+              var apellido_paterno = JSON.stringify(element['apellido_paterno'])
+              var apellido_materno = JSON.stringify(element['apellido_materno'])
+              var sexo = JSON.stringify(element['sexo'])
+              var edad = JSON.stringify(element['edad'])
 
-              let booking_id_g = JSON.stringify(data[i]['booking_id'])
-              let edad_paciente_g = JSON.stringify(data[i]['edad_paciente'])
-              let Sexo_g = JSON.stringify(data[i]['Sexo'])
-              let padecimiento_g = JSON.stringify(data[i]['padecimiento'])
-              let nombre_completo_paciente_g = JSON.stringify(data[i]['nombre_completo_paciente'])
-              //alert(fecha_consulta_g+" "+hora_g+" "+horb_g+" "+descripcion_g+" "+link_token_g)
+              //alert("id_cita: "+id_cita+" \nfecha_cita: "+fecha_cita+" \nhora_inicio: "+hora_inicio+" \nhora_final: "+hora_final+" \nenlace_videochat: "+enlace_videochat+" \ntipo_servicio: "+tipo_servicio+" \ndescripcion: "+descripcion+" \nantecedentes_principales"+antecedentes_principales+" \nid_paciente: "+id_paciente+" \nnombre: "+nombre+" \napellido_paterno: "+apellido_paterno+" \napellido_materno: "+apellido_materno+" \nsexo:"+sexo+" \nedad: "+edad)
+              
 
-              let fecha_consulta_SC = fecha_consulta_g.replace(/"/g, ''); 
-              var hora_SC = hora_g.replace(/"/g, ''); 
-              var horb_SC = horb_g.replace(/"/g, ''); 
-              var descripcion_SC = descripcion_g.replace(/"/g, ''); 
-              var link_token_SC = link_token_g.replace(/"/g, '');               
-              var tipo_servicio_SC = tipo_servicio_g.replace(/"/g, '');   
-
-              var booking_id_SC = booking_id_g.replace(/"/g, ''); 
-              var edad_paciente_SC = edad_paciente_g.replace(/"/g, ''); 
-              var Sexo_SC = Sexo_g.replace(/"/g, ''); 
-              var padecimiento_SC = padecimiento_g.replace(/"/g, '');               
-              var nombre_completo_paciente_SC = nombre_completo_paciente_g.replace(/"/g, '');   
+              var id_cita_SC = id_cita.replace(/"/g, '');
+              var fecha_cita_SC = fecha_cita.replace(/"/g, '');
+              var hora_inicio_SC = hora_inicio.replace(/"/g, '');
+              var hora_final_SC = hora_final.replace(/"/g, '');
+              var enlace_videochat_SC = enlace_videochat.replace(/"/g, '');
+              var tipo_servicio_SC = tipo_servicio.replace(/"/g, '');
+              var descripcion_SC = descripcion.replace(/"/g, '');
+              var antecedentes_principales_SC = antecedentes_principales.replace(/"/g, '');
+              var id_paciente_SC = id_paciente.replace(/"/g, '');
+              var nombre_SC = nombre.replace(/"/g, '');
+              var apellido_paterno_SC = apellido_paterno.replace(/"/g, '');
+              var apellido_materno_SC = apellido_materno.replace(/"/g, '');
+              var sexo_SC = sexo.replace(/"/g, '');
+              var edad_SC = edad.replace(/"/g, '');
 
               let objectNotification = {
-                "fecha_consulta": fecha_consulta_SC, 
-                "hora": hora_SC, 
-                "horb": horb_SC, 
+                "fecha_consulta": fecha_cita_SC, 
+                "hora": hora_inicio_SC, 
+                "horb": hora_final_SC, 
                 "descripcion": descripcion_SC, 
-                "link_token": link_token_SC, 
+                "link_token": enlace_videochat_SC, 
                 "tipo_servicio": tipo_servicio_SC,
-                "booking_id":booking_id_SC,
-                "edad_paciente":edad_paciente_SC,
-                "Sexo":Sexo_SC,
-                "padecimiento":padecimiento_SC,
-                "nombre_completo_paciente":nombre_completo_paciente_SC
+                "booking_id":id_cita_SC,
+                "edad_paciente":edad_SC,
+                "Sexo":sexo_SC,
+                "padecimiento":antecedentes_principales_SC,
+                "nombre_completo_paciente":nombre_SC+" "+apellido_paterno_SC+" "+apellido_materno_SC
               };
 
               //alert(typeof(objectNotification))
+              //alert("Para el modal: \n"+JSON.stringify(objectNotification))
               this.verDetallesEventoModal(objectNotification)
           }    
           
@@ -541,7 +559,7 @@ getDetallesCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,hor
 
   }, (error) => {
     console.log(error);
-    //alert("error: "+error)
+    alert("error: "+error)
   })
   
 }
@@ -552,18 +570,26 @@ getDetallesCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,hor
   rellenarArregloConConsultaBDremota(){
 
   if(this.horarios_medico != undefined){
-    
-    var resp2 = JSON.parse(this.horarios_medico);
+
+    //this.horarios_medico = this.resp['results'];//Datos de usuarios
+    //alert(JSON.stringify(this.horarios_medico[0]['Paciente']['id']))
+    var resp2 = this.horarios_medico['results'];
     var nFilas = JSON.parse(this.numeroFilas);
 
-        alert("Se agregaran "+nFilas+" nuevas filas\nElementos: "+JSON.stringify(resp2))
+        console.log("Se agregaran "+nFilas+" nuevas filas\n\n\nElementos pos[0]: "+JSON.stringify(resp2[0])+" \n\n\nElementos pos[1]: "+JSON.stringify(resp2[1]))
 
+        //alert("Se agregaran "+nFilas+" nuevas filas\n\n\nElementos pos[0]: "+JSON.stringify(resp2[0])+" \n\n\nElementos pos[1]: "+JSON.stringify(resp2[1]))
+
+        //alert(Object.keys(resp2).length)
 //        if(this.resp['respValue'] == "200"){
 
             for (let i = 0; i < Object.keys(resp2).length; i++) {
-                const element = this.resp['results'][i];
+              //for (let i = 0; i < nFilas; i++) {
+                //const element = this.resp['results'][i];
+                const element = resp2[i];
 
-                alert("Elemento "+i+":\n "+JSON.stringify(element))
+
+                //alert("Elemento "+i+":\n "+JSON.stringify(element))
                 
                 var id_cita = JSON.stringify(element['id'])
                 var fecha_cita = JSON.stringify(element['fecha_cita'])
@@ -573,14 +599,14 @@ getDetallesCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,hor
                 var tipo_servicio = JSON.stringify(element['tipo_servicio'])
                 var descripcion = JSON.stringify(element['descripcion'])
                 var antecedentes_principales = JSON.stringify(element['antecedentes_principales'])
-                var id_paciente = JSON.stringify(element['Paciente']['id_paciente'])
+                var id_paciente = JSON.stringify(element['Paciente']['id'])
                 var nombre = JSON.stringify(element['Paciente']['nombre'])
                 var apellido_paterno = JSON.stringify(element['Paciente']['apellido_paterno'])
                 var apellido_materno = JSON.stringify(element['Paciente']['apellido_materno'])
                 var sexo = JSON.stringify(element['Paciente']['sexo'])
                 var edad = JSON.stringify(element['Paciente']['edad'])
 
-                alert("id_cita: "+id_cita+" fecha_cita: "+fecha_cita+" hora_inicio: "+hora_inicio+" hora_final: "+hora_final+" enlace_videochat: "+enlace_videochat+" tipo_servicio: "+tipo_servicio+" descripcion: "+descripcion+" antecedentes_principales"+antecedentes_principales+" id_paciente: "+id_paciente+" nombre: "+nombre+" apellido_paterno: "+apellido_paterno+" apellido_materno: "+apellido_materno+" sexo:"+sexo+"edad: "+edad)
+                //alert("id_cita: "+id_cita+" \nfecha_cita: "+fecha_cita+" \nhora_inicio: "+hora_inicio+" \nhora_final: "+hora_final+" \nenlace_videochat: "+enlace_videochat+" \ntipo_servicio: "+tipo_servicio+" \ndescripcion: "+descripcion+" \nantecedentes_principales"+antecedentes_principales+" \nid_paciente: "+id_paciente+" \nnombre: "+nombre+" \napellido_paterno: "+apellido_paterno+" \napellido_materno: "+apellido_materno+" \nsexo:"+sexo+" \nedad: "+edad)
                 
 
                 var id_cita_SC = id_cita.replace(/"/g, '');
@@ -598,6 +624,9 @@ getDetallesCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,hor
                 var sexo_SC = sexo.replace(/"/g, '');
                 var edad_SC = edad.replace(/"/g, '');
 
+                //alert("Datos a almacenar...")
+                //alert("id_cita: "+id_cita_SC+" \nfecha_cita: "+fecha_cita_SC+" \nhora_inicio: "+hora_inicio_SC+" \nhora_final: "+hora_final_SC+" \nenlace_videochat: "+enlace_videochat_SC+" \ntipo_servicio: "+tipo_servicio_SC+" \ndescripcion: "+descripcion_SC+" \nantecedentes_principales"+antecedentes_principales_SC+" \nid_paciente: "+id_paciente_SC+" \nnombre: "+nombre_SC+" \napellido_paterno: "+apellido_paterno_SC+" \napellido_materno: "+apellido_materno_SC+" \nsexo:"+sexo_SC+" \nedad: "+edad_SC)
+                
                 this.almacenarHorariosEnLocalBD(id_cita_SC, fecha_cita_SC, hora_inicio_SC, hora_final_SC, enlace_videochat_SC,tipo_servicio_SC, descripcion_SC, antecedentes_principales_SC, id_paciente_SC, nombre_SC, apellido_paterno_SC,apellido_materno_SC,sexo_SC,edad_SC, nFilas);
             }
             window.localStorage.setItem("numFilasDBremota",window.localStorage.getItem("numFilasDBActual"))

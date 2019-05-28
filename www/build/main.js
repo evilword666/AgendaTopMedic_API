@@ -94,10 +94,17 @@ var LoginPage = /** @class */ (function () {
         this.data.username = '';
         this.data.response = '';
         this.http = http;
+        //alert(window.localStorage.getItem("user"))
+        // 
+        //window.localStorage.setItem("pass", String(this.pass));  
+        if (window.localStorage.getItem("user") != null) {
+            this.user = window.localStorage.getItem("user");
+            this.pass = window.localStorage.getItem("pass");
+        }
     }
     LoginPage.prototype.ionViewDidLoad = function () {
-        this.user = "surleds@gmail.com";
-        this.pass = "b44ESjktTOhNba@6&Y";
+        //this.user = "javier@gmail.com";
+        //this.pass = "lalaland2222";    
     };
     LoginPage.prototype.presentLoadingCustom = function () {
         this.loading = this.loadingCtrl.create({
@@ -129,6 +136,33 @@ var LoginPage = /** @class */ (function () {
         });
         alert.present();
     };
+    LoginPage.prototype.errorConexion = function () {
+        this.loading.dismiss();
+        var alert = this.alertCtrl.create({
+            title: '<center><h4>Error de conexión</h4></center>',
+            subTitle: "<center>Por favor verifique su conexi\u00F3n a internet</center>",
+            buttons: ['Aceptar']
+        });
+        alert.present();
+    };
+    LoginPage.prototype.errorEstructuraCorreo = function () {
+        this.loading.dismiss();
+        var alert = this.alertCtrl.create({
+            title: '<center><h4>Error con el correo</h4></center>',
+            subTitle: "<center>El correo es erroneo, por favor verifiquelo otra vez</center>",
+            buttons: ['Aceptar']
+        });
+        alert.present();
+    };
+    LoginPage.prototype.errorUsuarioBaneado = function () {
+        this.loading.dismiss();
+        var alert = this.alertCtrl.create({
+            title: '<center><h4>Usuario baneado</h4></center>',
+            subTitle: "<center>Usted ha excedido el limite de intentos permitidos</center>",
+            buttons: ['Aceptar']
+        });
+        alert.present();
+    };
     LoginPage.prototype.camposVacios = function () {
         var alert = this.alertCtrl.create({
             title: '<center><h4>Error en inicio de sesión</h4></center>',
@@ -147,46 +181,48 @@ var LoginPage = /** @class */ (function () {
         headers.append('Content-Type', 'application/json');
         var options = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["d" /* RequestOptions */]({ headers: headers });
         if (this.user != "" && this.pass != "") {
-            var link = 'http://104.248.176.189:8001/rest-auth/login/';
-            var credentials = JSON.stringify({ "email": "javier@gmail.com", "password": "lalaland2222" });
-            this.presentLoadingCustom();
-            try {
-                this.http.post(link, credentials, options)
-                    .subscribe(function (data) {
-                    //this.data.response = data["_body"]; 
-                    console.log(data);
-                    _this.data.response = data["_body"];
-                    var resp = JSON.parse(_this.data.response);
-                    //alert(JSON.stringify(resp))
-                    /*
-                                if(resp['response'] == "200"){
-                                  window.localStorage.setItem("user", String(this.user));
-                                  window.localStorage.setItem("pass", String(this.pass));
-                                  window.localStorage.setItem("id_doctor", String(resp['id']));
-                                  this.exitoLogin();
-                                }else{
-                                  this.errorLogin();
-                                  //this.exitoLogin();
-                                }
-                    */
-                    window.localStorage.setItem("user", String(_this.user));
-                    window.localStorage.setItem("pass", String(_this.pass));
-                    //let id_doctor = String(resp['user']['id']);
-                    var key = String(resp['key']);
-                    //alert(key)
-                    window.localStorage.setItem("id_doctor", key);
-                    _this.exitoLogin();
-                }, function (error) {
-                    alert(error);
-                    console.log("Oooops!");
-                    _this.loading.dismiss();
-                    //alert("No se pudieron enviar los datos\nIntentelo mas tarde");        
-                    _this.errorLogin();
-                });
+            if ((this.user.indexOf("@") > -1)) {
+                var link = 'http://104.248.176.189:8001/rest-auth/login/';
+                var credentials = JSON.stringify({ "email": this.user, "password": this.pass });
+                this.presentLoadingCustom();
+                try {
+                    this.http.post(link, credentials, options)
+                        .subscribe(function (data) {
+                        console.log(data);
+                        _this.data.response = data["_body"];
+                        var resp = JSON.parse(_this.data.response);
+                        window.localStorage.setItem("user", String(_this.user));
+                        window.localStorage.setItem("pass", String(_this.pass));
+                        var key = String(resp['key']);
+                        window.localStorage.setItem("id_doctor", key);
+                        _this.exitoLogin();
+                    }, function (error) {
+                        //alert(error)
+                        console.log(error);
+                        //alert(error['status']) //Nos da el codigo del tipo de error 
+                        var stringError = error + " ";
+                        var typeError = stringError.indexOf("401") > -1; //Buscamos la subcadena 401 que indica error de credenciales, devuelve un booleano
+                        //Aqui clasificaremos los errores obtenidos en el servidor
+                        if (error['status'] == "401") {
+                            _this.errorLogin();
+                        }
+                        else if (error['status'] == "0") {
+                            _this.errorConexion();
+                        }
+                        else if (error['status'] == "429") {
+                            _this.errorUsuarioBaneado();
+                        }
+                        console.log("Oooops!");
+                        _this.loading.dismiss();
+                    });
+                }
+                catch (error) {
+                    //console.log("Catch: "+error)
+                    alert("Hay un error en el servidor");
+                }
             }
-            catch (error) {
-                console.log("Catch: " + error);
-                alert("Hay un error en el servidor");
+            else {
+                this.errorEstructuraCorreo();
             }
         }
         else {
@@ -197,9 +233,10 @@ var LoginPage = /** @class */ (function () {
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
             selector: 'page-login',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/login/login.html"*/'<ion-toolbar color="primary" class="centrado"><img src="img/logo-header.png" class="headerlogo">\n</ion-toolbar>\n<ion-content text-center>\n\n  <img src="img/doctor_logo.png" width="50%" class="margin" />\n  <ion-list>    \n      <ion-item>\n        <ion-label floating>Usuario</ion-label>\n        <ion-input type="text" [(ngModel)]="user"></ion-input>\n      </ion-item>\n    \n      <ion-item>        \n        <ion-label floating>Contraseña</ion-label>\n        <ion-input [type]="passwordType" [(ngModel)]="pass"></ion-input>\n        <!--<ion-icon name="eye" color="primary" item-end (click)="mostrarPassword()"></ion-icon>-->\n\n        <button ion-button clear item-end large [color]="passwordShowed === true ? \'primary\' : \'danger\'" (click)="mostrarPassword()">\n          <ion-icon name="eye"></ion-icon>\n        </button>        \n      </ion-item>        \n      \n        <p></p>\n\n    </ion-list>\n    \n<!--\n    <button ion-button outline item-end icon-left color="gris" (click)="registrarse()">Registrarse <br>\n    <ion-icon name="md-create"></ion-icon>\n  </button>\n-->\n\n    <button ion-button outline item-end icon-left  color="Primary" (click)="login()">Ingresar <br><!-- loguear -->\n        <ion-icon name="person"></ion-icon>\n    </button>\n<!--\n    <button ion-button outline item-end icon-left  color="Primary" (click)="mostrarPassword()">Mostrar contraseña\n      <ion-icon name="eye"></ion-icon>\n  </button>\n-->        \n<!--\n<ion-fab right bottom >\n  <button ion-fab >\n      <ion-icon name="md-calendar" large></ion-icon>\n   </button>\n   <ion-fab-list side="top"> \n    <button class="option" ion-fab><ion-icon name="md-remove"></ion-icon><ion-label>Eliminar cita</ion-label></button>\n    <button class="option" ion-fab><ion-icon name="md-add"></ion-icon><ion-label>Agregar cita</ion-label></button>\n    <button class="option" ion-fab><ion-icon name="md-refresh"></ion-icon><ion-label>Actualizar cita</ion-label></button>\n  </ion-fab-list>\n</ion-fab>\n-->\n\n\n\n</ion-content>\n\n<ion-footer>\n  \n  <ion-toolbar id="daatlab" color="primary"><span>POWERED BY:</span> <img src="img/daatlab-footer.png">\n  </ion-toolbar>\n</ion-footer>\n\n'/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/login/login.html"*/,
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */]])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */]) === "function" && _e || Object])
     ], LoginPage);
     return LoginPage;
+    var _a, _b, _c, _d, _e;
 }());
 
 //# sourceMappingURL=login.js.map
@@ -524,11 +561,19 @@ var HomePage = /** @class */ (function () {
             _this.resp = JSON.parse(_this.data.response);
             //alert(JSON.stringify(this.resp))
             //alert(JSON.stringify(this.resp['results']))
-            console.log(JSON.stringify(_this.resp));
+            //console.log(JSON.stringify(this.resp))
             //                 if(this.resp['respValue'] == "200" ){
-            _this.horarios_medico = JSON.stringify(_this.resp['results']); //Datos de usuarios
+            //this.horarios_medico = this.resp['results'];//Datos de usuarios
+            _this.horarios_medico = _this.resp; //Datos de usuarios
             _this.numeroFilas = JSON.stringify(_this.resp['count']);
-            console.log("Resultado consulta: " + JSON.stringify(_this.resp));
+            //alert(JSON.stringify(this.horarios_medico[0]['Paciente']['id']))
+            //alert(JSON.stringify(this.horarios_medico[1]))
+            //alert(JSON.stringify(this.horarios_medico[2]))
+            console.log(_this.horarios_medico['results']['Paciente']);
+            //alert(Object.keys(this.horarios_medico['results']).length)
+            //console.log("\n\nResultado consulta: "+JSON.stringify(this.horarios_medico))
+            //console.log("\n\nResultado consulta[0]: "+JSON.stringify(this.horarios_medico[0]))
+            //console.log("\n\nResultado consulta[1]: "+JSON.stringify(this.horarios_medico[1]))
             window.localStorage.setItem("numFilasDBActual", _this.numeroFilas);
             //alert("LocalStorageXD: "+window.localStorage.getItem("numFilasDBremota")+" numberFilas:"+this.numeroFilas)
             //Limpiamos la BD local para poder insertar los nuevos valores de la BD remota
@@ -592,7 +637,7 @@ var HomePage = /** @class */ (function () {
                 }
                 else {
                     //alert("No se pudieron insertar los datos :(")
-                    console.log("No se pudieron insertar los datos :(");
+                    console.log("No se pudo insertar el token :(");
                 }
             }, function (error) {
                 alert("No se pudieron enviar los datos\nIntentelo mas tarde");
@@ -607,6 +652,7 @@ var HomePage = /** @class */ (function () {
     /**************************************************************************************************************/
     HomePage.prototype.almacenarHorariosEnLocalBD = function (id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat, tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno, apellido_materno, sexo, edad, numCitas) {
         var _this = this;
+        //alert("Entrando a la funcion de almacenamieto")
         this.database.almacenarCitasEnBD(id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat, tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno, apellido_materno, sexo, edad, numCitas).then(function (data) {
             //console.log(JSON.stringify("Numero de datos insertados: "+data))
             if (JSON.stringify(data) == numCitas + "") {
@@ -614,7 +660,7 @@ var HomePage = /** @class */ (function () {
                 _this.getCitas();
             }
         }, function (error) {
-            console.log("Error al crear usuario: " + error);
+            console.log("Error al alamacenar datos de consulta de API: " + error);
             //alert("xdxdxd: "+error)
             //alert("Error al crear: "+error)
         });
@@ -632,9 +678,9 @@ var HomePage = /** @class */ (function () {
             //alert("Ahora pintaremos "+data.length+" citas en el calendario")
             for (var i = 0; i < data.length; i++) {
                 var element = data[i];
-                var fecha_consulta_g = JSON.stringify(data[i]['fecha_consulta']);
-                var hora_g = JSON.stringify(data[i]['hora']);
-                var horb_g = JSON.stringify(data[i]['horb']);
+                var fecha_consulta_g = JSON.stringify(data[i]['fecha_cita']);
+                var hora_g = JSON.stringify(data[i]['hora_inicio']);
+                var horb_g = JSON.stringify(data[i]['hora_final']);
                 var descripcion_g = JSON.stringify(data[i]['descripcion']);
                 var fecha_consulta_SC = fecha_consulta_g.replace(/"/g, '');
                 var hora_SC = hora_g.replace(/"/g, '');
@@ -662,67 +708,13 @@ var HomePage = /** @class */ (function () {
     /**************************************************************************************************************/
     HomePage.prototype.getDetallesCitaSeleccionada = function (fechaCitaSeleccionada, horaInicioCitaSeleccionada, horaFinCitaSeleccionada) {
         var _this = this;
+        //alert("Entrando a funcion para obtener campos de fecha seleccionada")
         //Usamos la funcion creada en el proveedor database.ts para obtener los datos de las citas
+        //alert("Fecha: "+fechaCitaSeleccionada+"\nInicio: "+horaInicioCitaSeleccionada+"\nFin: "+horaFinCitaSeleccionada)
         this.database.obtenerCamposCitaSeleccionada(fechaCitaSeleccionada, horaInicioCitaSeleccionada, horaFinCitaSeleccionada).then(function (data) {
             for (var i = 0; i < data.length; i++) {
                 var element = data[i];
-                var fecha_consulta_g = JSON.stringify(data[i]['fecha_consulta']);
-                var hora_g = JSON.stringify(data[i]['hora']);
-                var horb_g = JSON.stringify(data[i]['horb']);
-                var descripcion_g = JSON.stringify(data[i]['descripcion']);
-                var link_token_g = JSON.stringify(data[i]['link_token']);
-                var tipo_servicio_g = JSON.stringify(data[i]['tipo_servicio']);
-                var booking_id_g = JSON.stringify(data[i]['booking_id']);
-                var edad_paciente_g = JSON.stringify(data[i]['edad_paciente']);
-                var Sexo_g = JSON.stringify(data[i]['Sexo']);
-                var padecimiento_g = JSON.stringify(data[i]['padecimiento']);
-                var nombre_completo_paciente_g = JSON.stringify(data[i]['nombre_completo_paciente']);
-                //alert(fecha_consulta_g+" "+hora_g+" "+horb_g+" "+descripcion_g+" "+link_token_g)
-                var fecha_consulta_SC = fecha_consulta_g.replace(/"/g, '');
-                var hora_SC = hora_g.replace(/"/g, '');
-                var horb_SC = horb_g.replace(/"/g, '');
-                var descripcion_SC = descripcion_g.replace(/"/g, '');
-                var link_token_SC = link_token_g.replace(/"/g, '');
-                var tipo_servicio_SC = tipo_servicio_g.replace(/"/g, '');
-                var booking_id_SC = booking_id_g.replace(/"/g, '');
-                var edad_paciente_SC = edad_paciente_g.replace(/"/g, '');
-                var Sexo_SC = Sexo_g.replace(/"/g, '');
-                var padecimiento_SC = padecimiento_g.replace(/"/g, '');
-                var nombre_completo_paciente_SC = nombre_completo_paciente_g.replace(/"/g, '');
-                var objectNotification = {
-                    "fecha_consulta": fecha_consulta_SC,
-                    "hora": hora_SC,
-                    "horb": horb_SC,
-                    "descripcion": descripcion_SC,
-                    "link_token": link_token_SC,
-                    "tipo_servicio": tipo_servicio_SC,
-                    "booking_id": booking_id_SC,
-                    "edad_paciente": edad_paciente_SC,
-                    "Sexo": Sexo_SC,
-                    "padecimiento": padecimiento_SC,
-                    "nombre_completo_paciente": nombre_completo_paciente_SC
-                };
-                //alert(typeof(objectNotification))
-                _this.verDetallesEventoModal(objectNotification);
-            }
-        }, function (error) {
-            console.log(error);
-            //alert("error: "+error)
-        });
-    };
-    /**************************************************************************************************************/
-    /**************************************************************************************************************/
-    /**************************************************************************************************************/
-    HomePage.prototype.rellenarArregloConConsultaBDremota = function () {
-        if (this.horarios_medico != undefined) {
-            var resp2 = JSON.parse(this.horarios_medico);
-            var nFilas = JSON.parse(this.numeroFilas);
-            alert("Se agregaran " + nFilas + " nuevas filas\nElementos: " + JSON.stringify(resp2));
-            //        if(this.resp['respValue'] == "200"){
-            for (var i = 0; i < Object.keys(resp2).length; i++) {
-                var element = this.resp['results'][i];
-                alert("Elemento " + i + ":\n " + JSON.stringify(element));
-                var id_cita = JSON.stringify(element['id']);
+                var id_cita = JSON.stringify(element['id_cita']);
                 var fecha_cita = JSON.stringify(element['fecha_cita']);
                 var hora_inicio = JSON.stringify(element['hora_inicio']);
                 var hora_final = JSON.stringify(element['hora_final']);
@@ -730,13 +722,13 @@ var HomePage = /** @class */ (function () {
                 var tipo_servicio = JSON.stringify(element['tipo_servicio']);
                 var descripcion = JSON.stringify(element['descripcion']);
                 var antecedentes_principales = JSON.stringify(element['antecedentes_principales']);
-                var id_paciente = JSON.stringify(element['Paciente']['id_paciente']);
-                var nombre = JSON.stringify(element['Paciente']['nombre']);
-                var apellido_paterno = JSON.stringify(element['Paciente']['apellido_paterno']);
-                var apellido_materno = JSON.stringify(element['Paciente']['apellido_materno']);
-                var sexo = JSON.stringify(element['Paciente']['sexo']);
-                var edad = JSON.stringify(element['Paciente']['edad']);
-                alert("Elemento " + i + ":\n " + element);
+                var id_paciente = JSON.stringify(element['id_paciente']);
+                var nombre = JSON.stringify(element['nombre']);
+                var apellido_paterno = JSON.stringify(element['apellido_paterno']);
+                var apellido_materno = JSON.stringify(element['apellido_materno']);
+                var sexo = JSON.stringify(element['sexo']);
+                var edad = JSON.stringify(element['edad']);
+                //alert("id_cita: "+id_cita+" \nfecha_cita: "+fecha_cita+" \nhora_inicio: "+hora_inicio+" \nhora_final: "+hora_final+" \nenlace_videochat: "+enlace_videochat+" \ntipo_servicio: "+tipo_servicio+" \ndescripcion: "+descripcion+" \nantecedentes_principales"+antecedentes_principales+" \nid_paciente: "+id_paciente+" \nnombre: "+nombre+" \napellido_paterno: "+apellido_paterno+" \napellido_materno: "+apellido_materno+" \nsexo:"+sexo+" \nedad: "+edad)
                 var id_cita_SC = id_cita.replace(/"/g, '');
                 var fecha_cita_SC = fecha_cita.replace(/"/g, '');
                 var hora_inicio_SC = hora_inicio.replace(/"/g, '');
@@ -751,6 +743,77 @@ var HomePage = /** @class */ (function () {
                 var apellido_materno_SC = apellido_materno.replace(/"/g, '');
                 var sexo_SC = sexo.replace(/"/g, '');
                 var edad_SC = edad.replace(/"/g, '');
+                var objectNotification = {
+                    "fecha_consulta": fecha_cita_SC,
+                    "hora": hora_inicio_SC,
+                    "horb": hora_final_SC,
+                    "descripcion": descripcion_SC,
+                    "link_token": enlace_videochat_SC,
+                    "tipo_servicio": tipo_servicio_SC,
+                    "booking_id": id_cita_SC,
+                    "edad_paciente": edad_SC,
+                    "Sexo": sexo_SC,
+                    "padecimiento": antecedentes_principales_SC,
+                    "nombre_completo_paciente": nombre_SC + " " + apellido_paterno_SC + " " + apellido_materno_SC
+                };
+                //alert(typeof(objectNotification))
+                //alert("Para el modal: \n"+JSON.stringify(objectNotification))
+                _this.verDetallesEventoModal(objectNotification);
+            }
+        }, function (error) {
+            console.log(error);
+            alert("error: " + error);
+        });
+    };
+    /**************************************************************************************************************/
+    /**************************************************************************************************************/
+    /**************************************************************************************************************/
+    HomePage.prototype.rellenarArregloConConsultaBDremota = function () {
+        if (this.horarios_medico != undefined) {
+            //this.horarios_medico = this.resp['results'];//Datos de usuarios
+            //alert(JSON.stringify(this.horarios_medico[0]['Paciente']['id']))
+            var resp2 = this.horarios_medico['results'];
+            var nFilas = JSON.parse(this.numeroFilas);
+            console.log("Se agregaran " + nFilas + " nuevas filas\n\n\nElementos pos[0]: " + JSON.stringify(resp2[0]) + " \n\n\nElementos pos[1]: " + JSON.stringify(resp2[1]));
+            //alert("Se agregaran "+nFilas+" nuevas filas\n\n\nElementos pos[0]: "+JSON.stringify(resp2[0])+" \n\n\nElementos pos[1]: "+JSON.stringify(resp2[1]))
+            //alert(Object.keys(resp2).length)
+            //        if(this.resp['respValue'] == "200"){
+            for (var i = 0; i < Object.keys(resp2).length; i++) {
+                //for (let i = 0; i < nFilas; i++) {
+                //const element = this.resp['results'][i];
+                var element = resp2[i];
+                //alert("Elemento "+i+":\n "+JSON.stringify(element))
+                var id_cita = JSON.stringify(element['id']);
+                var fecha_cita = JSON.stringify(element['fecha_cita']);
+                var hora_inicio = JSON.stringify(element['hora_inicio']);
+                var hora_final = JSON.stringify(element['hora_final']);
+                var enlace_videochat = JSON.stringify(element['enlace_videochat']);
+                var tipo_servicio = JSON.stringify(element['tipo_servicio']);
+                var descripcion = JSON.stringify(element['descripcion']);
+                var antecedentes_principales = JSON.stringify(element['antecedentes_principales']);
+                var id_paciente = JSON.stringify(element['Paciente']['id']);
+                var nombre = JSON.stringify(element['Paciente']['nombre']);
+                var apellido_paterno = JSON.stringify(element['Paciente']['apellido_paterno']);
+                var apellido_materno = JSON.stringify(element['Paciente']['apellido_materno']);
+                var sexo = JSON.stringify(element['Paciente']['sexo']);
+                var edad = JSON.stringify(element['Paciente']['edad']);
+                //alert("id_cita: "+id_cita+" \nfecha_cita: "+fecha_cita+" \nhora_inicio: "+hora_inicio+" \nhora_final: "+hora_final+" \nenlace_videochat: "+enlace_videochat+" \ntipo_servicio: "+tipo_servicio+" \ndescripcion: "+descripcion+" \nantecedentes_principales"+antecedentes_principales+" \nid_paciente: "+id_paciente+" \nnombre: "+nombre+" \napellido_paterno: "+apellido_paterno+" \napellido_materno: "+apellido_materno+" \nsexo:"+sexo+" \nedad: "+edad)
+                var id_cita_SC = id_cita.replace(/"/g, '');
+                var fecha_cita_SC = fecha_cita.replace(/"/g, '');
+                var hora_inicio_SC = hora_inicio.replace(/"/g, '');
+                var hora_final_SC = hora_final.replace(/"/g, '');
+                var enlace_videochat_SC = enlace_videochat.replace(/"/g, '');
+                var tipo_servicio_SC = tipo_servicio.replace(/"/g, '');
+                var descripcion_SC = descripcion.replace(/"/g, '');
+                var antecedentes_principales_SC = antecedentes_principales.replace(/"/g, '');
+                var id_paciente_SC = id_paciente.replace(/"/g, '');
+                var nombre_SC = nombre.replace(/"/g, '');
+                var apellido_paterno_SC = apellido_paterno.replace(/"/g, '');
+                var apellido_materno_SC = apellido_materno.replace(/"/g, '');
+                var sexo_SC = sexo.replace(/"/g, '');
+                var edad_SC = edad.replace(/"/g, '');
+                //alert("Datos a almacenar...")
+                //alert("id_cita: "+id_cita_SC+" \nfecha_cita: "+fecha_cita_SC+" \nhora_inicio: "+hora_inicio_SC+" \nhora_final: "+hora_final_SC+" \nenlace_videochat: "+enlace_videochat_SC+" \ntipo_servicio: "+tipo_servicio_SC+" \ndescripcion: "+descripcion_SC+" \nantecedentes_principales"+antecedentes_principales_SC+" \nid_paciente: "+id_paciente_SC+" \nnombre: "+nombre_SC+" \napellido_paterno: "+apellido_paterno_SC+" \napellido_materno: "+apellido_materno_SC+" \nsexo:"+sexo_SC+" \nedad: "+edad_SC)
                 this.almacenarHorariosEnLocalBD(id_cita_SC, fecha_cita_SC, hora_inicio_SC, hora_final_SC, enlace_videochat_SC, tipo_servicio_SC, descripcion_SC, antecedentes_principales_SC, id_paciente_SC, nombre_SC, apellido_paterno_SC, apellido_materno_SC, sexo_SC, edad_SC, nFilas);
             }
             window.localStorage.setItem("numFilasDBremota", window.localStorage.getItem("numFilasDBActual"));
@@ -1035,13 +1098,14 @@ var DatabaseProvider = /** @class */ (function () {
         console.log("Desde funcion de almacenamiento: \nid_cita: " + id_cita + " \nfecha_cita: " + fecha_cita + " " + " \nhora_inicio: " + hora_inicio + " \nhora_final: " + hora_final + " \nenlace_videochat: " + enlace_videochat + "\ntipo_servicio: " + tipo_servicio + "\ndescripcion: " + descripcion + " \nantecedentes_principales: " + antecedentes_principales + " \nid_paciente: " + id_paciente + " \nnombre: " + nombre + " \napellido_paterno: " + apellido_paterno + "  \napellido_materno: " + apellido_materno + "   \nsexo: " + sexo + "   \nedad: " + edad + " ");
         return new Promise(function (resolve, reject) {
             //id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text   
-            var sql = "INSERT INTO tb_datos_citas_pacientes (fecha_consulta, hora, horb, descripcion, link_token,tipo_servicio,booking_id,edad_paciente,Sexo,padecimiento,nombre_completo_paciente) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            //id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text)"
+            var sql = "INSERT INTO tb_datos_citas_pacientes (id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat,tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno,apellido_materno,sexo,edad) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             _this.db.executeSql(sql, [id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat, tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno, apellido_materno, sexo, edad]).then(function (data) {
                 //Aqui iba el resolve  
-                //alert("Duda: "+data)
+                //alert("Insercion correcta: "+data)
                 //console.log("Duda CONVERTIDA: "+JSON.stringify(data))
             }, function (error) {
-                alert("Insert db function: " + JSON.stringify(error));
+                //alert("Insert db function: "+JSON.stringify(error))
                 reject(error);
             });
             _this.contador++;
@@ -1096,8 +1160,8 @@ var DatabaseProvider = /** @class */ (function () {
     DatabaseProvider.prototype.obtenerCamposCitaSeleccionada = function (fechaCitaSeleccionada, horaInicioCitaSeleccionada, horaFinCitaSeleccionada) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            //fecha_consulta text, hora text, horb text, descripcion text, link_token text
-            var query = "SELECT * FROM horarios WHERE fecha_consulta = ? AND hora = ? AND horb = ? ";
+            //id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text   
+            var query = "SELECT * FROM tb_datos_citas_pacientes WHERE fecha_cita = ? AND hora_inicio = ? AND hora_final = ? ";
             //alert(query)
             _this.db.executeSql(query, [fechaCitaSeleccionada, horaInicioCitaSeleccionada, horaFinCitaSeleccionada]).then(function (data) {
                 //this.db.executeSql("SELECT * FROM horarios", []).then((data) => {
@@ -1106,18 +1170,20 @@ var DatabaseProvider = /** @class */ (function () {
                 if (data.rows.length > 0) {
                     for (var i = 0; i < data.rows.length; i++) {
                         arrayCamposCitaSeleccionada.push({
-                            id: data.rows.item(i).id,
-                            fecha_consulta: data.rows.item(i).fecha_consulta,
-                            hora: data.rows.item(i).hora,
-                            horb: data.rows.item(i).horb,
-                            descripcion: data.rows.item(i).descripcion,
-                            link_token: data.rows.item(i).link_token,
+                            id_cita: data.rows.item(i).id_cita,
+                            fecha_cita: data.rows.item(i).fecha_cita,
+                            hora_inicio: data.rows.item(i).hora_inicio,
+                            hora_final: data.rows.item(i).hora_final,
+                            enlace_videochat: data.rows.item(i).enlace_videochat,
                             tipo_servicio: data.rows.item(i).tipo_servicio,
-                            booking_id: data.rows.item(i).booking_id,
-                            edad_paciente: data.rows.item(i).edad_paciente,
-                            Sexo: data.rows.item(i).Sexo,
-                            padecimiento: data.rows.item(i).padecimiento,
-                            nombre_completo_paciente: data.rows.item(i).nombre_completo_paciente
+                            descripcion: data.rows.item(i).descripcion,
+                            antecedentes_principales: data.rows.item(i).antecedentes_principales,
+                            id_paciente: data.rows.item(i).id_paciente,
+                            nombre: data.rows.item(i).nombre,
+                            apellido_paterno: data.rows.item(i).apellido_paterno,
+                            apellido_materno: data.rows.item(i).apellido_materno,
+                            sexo: data.rows.item(i).sexo,
+                            edad: data.rows.item(i).edad
                         });
                     }
                 }
