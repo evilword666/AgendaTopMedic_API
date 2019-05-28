@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ɵConsole } from '@angular/core';
 import { IonicPage, NavController, NavParams, Loading } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
 import {Http, Headers } from '@angular/http';
@@ -37,11 +37,22 @@ export class LoginPage {
     this.data.username = '';
     this.data.response = '';    
     this.http = http;
+
+    //alert(window.localStorage.getItem("user"))
+
+    // 
+    //window.localStorage.setItem("pass", String(this.pass));  
+   if(window.localStorage.getItem("user") != null){
+    this.user = window.localStorage.getItem("user");
+    this.pass = window.localStorage.getItem("pass");  
+   }
+
+
   }
 
   ionViewDidLoad() {
-    this.user = "surleds@gmail.com";
-    this.pass = "b44ESjktTOhNba@6&Y";    
+    //this.user = "javier@gmail.com";
+    //this.pass = "lalaland2222";    
   }
 
   
@@ -87,6 +98,40 @@ export class LoginPage {
     alert.present();
   }
 
+  errorConexion() {
+    this.loading.dismiss(); 
+
+    let alert = this.alertCtrl.create({
+      title: '<center><h4>Error de conexión</h4></center>',
+      subTitle: `<center>Por favor verifique su conexión a internet</center>`,
+      buttons: ['Aceptar']
+    });
+    alert.present();
+  }
+
+  
+  errorEstructuraCorreo() {
+    this.loading.dismiss(); 
+
+    let alert = this.alertCtrl.create({
+      title: '<center><h4>Error con el correo</h4></center>',
+      subTitle: `<center>El correo es erroneo, por favor verifiquelo otra vez</center>`,
+      buttons: ['Aceptar']
+    });
+    alert.present();
+  }
+
+  errorUsuarioBaneado() {
+    this.loading.dismiss(); 
+
+    let alert = this.alertCtrl.create({
+      title: '<center><h4>Usuario baneado</h4></center>',
+      subTitle: `<center>Usted ha excedido el limite de intentos permitidos</center>`,
+      buttons: ['Aceptar']
+    });
+    alert.present();
+  }
+
   camposVacios(){
 
     let alert = this.alertCtrl.create({
@@ -107,61 +152,68 @@ export class LoginPage {
 
     const headers = new Headers()
     headers.append('Content-Type','application/json')
-
     let options = new RequestOptions({ headers: headers });
     
     if(this.user != "" && this.pass != "")
     {
+
+      if( (this.user.indexOf("@") > -1) ){
+          
+
       
-      var link = 'http://104.248.176.189:8001/rest-auth/login/';
-      var credentials = JSON.stringify({"email":"javier@gmail.com","password":"lalaland2222"});
-         
-      this.presentLoadingCustom();
       
-      try {
+          var link = 'http://104.248.176.189:8001/rest-auth/login/';
+          var credentials = JSON.stringify({"email":this.user,"password":this.pass});
+   
+          this.presentLoadingCustom();
+      
+          try {
 
-      this.http.post(link, credentials,options)                  
-      .subscribe(data => {
-        
-        //this.data.response = data["_body"]; 
-        console.log(data)
-        this.data.response = data["_body"]; 
-        var resp = JSON.parse(this.data.response);
-        
-            //alert(JSON.stringify(resp))
+          this.http.post(link, credentials,options)                  
+          .subscribe(data => {
 
-/*
-            if(resp['response'] == "200"){
-              window.localStorage.setItem("user", String(this.user));  
-              window.localStorage.setItem("pass", String(this.pass));  
-              window.localStorage.setItem("id_doctor", String(resp['id']));  
-              this.exitoLogin();              
-            }else{
-              this.errorLogin();               
-              //this.exitoLogin();
-            }
-*/
-            window.localStorage.setItem("user", String(this.user));  
-            window.localStorage.setItem("pass", String(this.pass));  
-            //let id_doctor = String(resp['user']['id']);
-            let key = String(resp['key']);
-            //alert(key)
-            window.localStorage.setItem("id_doctor", key);  
-            this.exitoLogin();  
+            console.log(data)
+            this.data.response = data["_body"]; 
+            var resp = JSON.parse(this.data.response);
 
-        }, error => {
-          alert(error)
-          console.log("Oooops!");
-          this.loading.dismiss(); 
-          //alert("No se pudieron enviar los datos\nIntentelo mas tarde");        
-          this.errorLogin();    
-        });
+                window.localStorage.setItem("user", String(this.user));  
+                window.localStorage.setItem("pass", String(this.pass));  
+           
+                let key = String(resp['key']);
+   
+                window.localStorage.setItem("id_doctor", key);  
 
-      } catch (error) {
-        console.log("Catch: "+error)
-        alert("Hay un error en el servidor")
+                this.exitoLogin();  
+
+            }, error => {
+              //alert(error)
+              console.log(error)
+              //alert(error['status']) //Nos da el codigo del tipo de error 
+
+              let stringError = error+" ";
+              let typeError = stringError.indexOf("401") > -1; //Buscamos la subcadena 401 que indica error de credenciales, devuelve un booleano
+
+              //Aqui clasificaremos los errores obtenidos en el servidor
+              if(error['status'] == "401"){
+                this.errorLogin()
+              }else if(error['status'] == "0"){
+                this.errorConexion();
+              }else if(error['status'] == "429"){
+                this.errorUsuarioBaneado()
+              }
+          
+              console.log("Oooops!");
+              this.loading.dismiss(); 
+
+            });
+
+          } catch (error) {
+            //console.log("Catch: "+error)
+            alert("Hay un error en el servidor")
+          }
+      }else{
+        this.errorEstructuraCorreo()
       }
-
       }else{
         this.camposVacios();
       }
