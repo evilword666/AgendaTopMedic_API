@@ -233,10 +233,9 @@ var LoginPage = /** @class */ (function () {
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
             selector: 'page-login',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/login/login.html"*/'<ion-toolbar color="primary" class="centrado"><img src="img/logo-header.png" class="headerlogo">\n</ion-toolbar>\n<ion-content text-center>\n\n  <img src="img/doctor_logo.png" width="50%" class="margin" />\n  <ion-list>    \n      <ion-item>\n        <ion-label floating>Usuario</ion-label>\n        <ion-input type="text" [(ngModel)]="user"></ion-input>\n      </ion-item>\n    \n      <ion-item>        \n        <ion-label floating>Contraseña</ion-label>\n        <ion-input [type]="passwordType" [(ngModel)]="pass"></ion-input>\n        <!--<ion-icon name="eye" color="primary" item-end (click)="mostrarPassword()"></ion-icon>-->\n\n        <button ion-button clear item-end large [color]="passwordShowed === true ? \'primary\' : \'danger\'" (click)="mostrarPassword()">\n          <ion-icon name="eye"></ion-icon>\n        </button>        \n      </ion-item>        \n      \n        <p></p>\n\n    </ion-list>\n    \n<!--\n    <button ion-button outline item-end icon-left color="gris" (click)="registrarse()">Registrarse <br>\n    <ion-icon name="md-create"></ion-icon>\n  </button>\n-->\n\n    <button ion-button outline item-end icon-left  color="Primary" (click)="login()">Ingresar <br><!-- loguear -->\n        <ion-icon name="person"></ion-icon>\n    </button>\n<!--\n    <button ion-button outline item-end icon-left  color="Primary" (click)="mostrarPassword()">Mostrar contraseña\n      <ion-icon name="eye"></ion-icon>\n  </button>\n-->        \n<!--\n<ion-fab right bottom >\n  <button ion-fab >\n      <ion-icon name="md-calendar" large></ion-icon>\n   </button>\n   <ion-fab-list side="top"> \n    <button class="option" ion-fab><ion-icon name="md-remove"></ion-icon><ion-label>Eliminar cita</ion-label></button>\n    <button class="option" ion-fab><ion-icon name="md-add"></ion-icon><ion-label>Agregar cita</ion-label></button>\n    <button class="option" ion-fab><ion-icon name="md-refresh"></ion-icon><ion-label>Actualizar cita</ion-label></button>\n  </ion-fab-list>\n</ion-fab>\n-->\n\n\n\n</ion-content>\n\n<ion-footer>\n  \n  <ion-toolbar id="daatlab" color="primary"><span>POWERED BY:</span> <img src="img/daatlab-footer.png">\n  </ion-toolbar>\n</ion-footer>\n\n'/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/login/login.html"*/,
         }),
-        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */]) === "function" && _e || Object])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */]])
     ], LoginPage);
     return LoginPage;
-    var _a, _b, _c, _d, _e;
 }());
 
 //# sourceMappingURL=login.js.map
@@ -617,33 +616,43 @@ var HomePage = /** @class */ (function () {
     /**************************************************************************************************************/
     HomePage.prototype.insertIdMedicoToken = function () {
         var _this = this;
-        //var link = 'http://93.104.215.239/ecg_mqtt/DATABASE/insertarAgendaMedicos.php';
-        var link = 'https://topmedic.com.mx/accessDatabase/wp_DB/service/recibirDatos.php';
-        var id_token = JSON.stringify({ id_medico: window.localStorage.getItem("id_doctor"), tokenPhoneMedico: localStorage.getItem("phoneToken"), UUID_Phone: localStorage.getItem("UUID_Phone") });
-        //alert("Se enviaran los datos: "+JSON.stringify({id_medico: window.localStorage.getItem("id_doctor"), tokenPhoneMedico:localStorage.getItem("phoneToken")}))
+        var headers = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', 'Token ' + window.localStorage.getItem("id_doctor")); //Aqui se agrega el key del medico obtenido del login
+        var options = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["d" /* RequestOptions */]({ headers: headers });
+        var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/token/2';
+        var credentials = JSON.stringify({ "token_firebase": localStorage.getItem("phoneToken"), "uid_phone": localStorage.getItem("UUID_Phone") });
         try {
-            this.http.post(link, id_token)
+            this.http.put(link, credentials, options)
                 .subscribe(function (data) {
-                _this.data2.response = data["_body"];
-                //alert(JSON.stringify(this.data2.response))
-                var resp = JSON.parse(_this.data2.response);
-                if (resp['response'] == "200") {
-                    //alert("Se insertaron correctamente los datos en la bd")
-                    console.log("Se insertaron correctamente los datos en la bd");
-                }
-                else if (resp['response'] == "100") {
-                    //alert("Los datos de este medico ya se habian registraron en la BD")
-                    console.log("El token de las notificaciones push se ha actualizado en la BD");
-                }
-                else {
-                    //alert("No se pudieron insertar los datos :(")
-                    console.log("No se pudo insertar el token :(");
-                }
+                console.log(data);
+                _this.data.response = data["_body"];
+                var resp = JSON.parse(_this.data.response);
+                alert(resp);
             }, function (error) {
-                alert("No se pudieron enviar los datos\nIntentelo mas tarde");
+                //alert(error)
+                console.log(error);
+                alert("Error");
+                alert(error);
+                //alert(error['status']) //Nos da el codigo del tipo de error 
+                var stringError = error + " ";
+                var typeError = stringError.indexOf("401") > -1; //Buscamos la subcadena 401 que indica error de credenciales, devuelve un booleano
+                //Aqui clasificaremos los errores obtenidos en el servidor
+                if (error['status'] == "401") {
+                    //this.errorLogin()
+                }
+                else if (error['status'] == "0") {
+                    //this.errorConexion();
+                }
+                else if (error['status'] == "429") {
+                    //this.errorUsuarioBaneado()
+                }
+                console.log("Oooops!");
+                _this.loading.dismiss();
             });
         }
         catch (error) {
+            //console.log("Catch: "+error)
             alert("Hay un error en el servidor");
         }
     };

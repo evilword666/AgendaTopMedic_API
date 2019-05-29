@@ -378,47 +378,57 @@ checarCambiosNotificacionesRecibidas(){
   /**************************************************************************************************************/            
 
   insertIdMedicoToken(){    
-
-    //var link = 'http://93.104.215.239/ecg_mqtt/DATABASE/insertarAgendaMedicos.php';
-    var link = 'https://topmedic.com.mx/accessDatabase/wp_DB/service/recibirDatos.php';
     
-    var id_token = JSON.stringify({id_medico: window.localStorage.getItem("id_doctor"), tokenPhoneMedico:localStorage.getItem("phoneToken"),UUID_Phone:localStorage.getItem("UUID_Phone")});
-          
-    
-    //alert("Se enviaran los datos: "+JSON.stringify({id_medico: window.localStorage.getItem("id_doctor"), tokenPhoneMedico:localStorage.getItem("phoneToken")}))
+    const headers = new Headers()
+    headers.append('Content-Type','application/json')
+    headers.append('Authorization','Token '+window.localStorage.getItem("id_doctor")) //Aqui se agrega el key del medico obtenido del login
 
-          try {
 
-            this.http.post(link, id_token)                  
-            .subscribe(data => {              
-      
-              this.data2.response = data["_body"]; 
+    let options = new RequestOptions({ headers: headers });
 
-              //alert(JSON.stringify(this.data2.response))
-     
-              var resp = JSON.parse(this.data2.response);                            
-              
-                  if(resp['response'] == "200"){
-                        //alert("Se insertaron correctamente los datos en la bd")
-                        console.log("Se insertaron correctamente los datos en la bd")
-                  }else if(resp['response'] == "100"){
-                    //alert("Los datos de este medico ya se habian registraron en la BD")
-                    console.log("El token de las notificaciones push se ha actualizado en la BD")
-                  }else{
-                    //alert("No se pudieron insertar los datos :(")
-                    console.log("No se pudo insertar el token :(")
-                  }
-                  
-              }, error => {
+    var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/token/2';
+    var credentials = JSON.stringify({"token_firebase":localStorage.getItem("phoneToken"),"uid_phone":localStorage.getItem("UUID_Phone")});
 
-                alert("No se pudieron enviar los datos\nIntentelo mas tarde");          
-              });
-      
-            } catch (error) {
-              alert("Hay un error en el servidor")
-            }
 
+    try {
+
+    this.http.put(link, credentials,options)                  
+    .subscribe(data => {
+
+      console.log(data)
+      this.data.response = data["_body"]; 
+      var resp = JSON.parse(this.data.response);
+
+        alert(resp)
+
+      }, error => {
+        //alert(error)
+        console.log(error)
+        alert("Error")
+        alert(error)
+        //alert(error['status']) //Nos da el codigo del tipo de error 
+
+        let stringError = error+" ";
+        let typeError = stringError.indexOf("401") > -1; //Buscamos la subcadena 401 que indica error de credenciales, devuelve un booleano
+
+        //Aqui clasificaremos los errores obtenidos en el servidor
+        if(error['status'] == "401"){
+          //this.errorLogin()
+        }else if(error['status'] == "0"){
+          //this.errorConexion();
+        }else if(error['status'] == "429"){
+          //this.errorUsuarioBaneado()
+        }
   
+        console.log("Oooops!");
+        this.loading.dismiss(); 
+
+      });
+
+    } catch (error) {
+      //console.log("Catch: "+error)
+      alert("Hay un error en el servidor")
+    }
           
   }
 
