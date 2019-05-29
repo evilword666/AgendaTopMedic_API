@@ -244,7 +244,7 @@ var ModalPage = /** @class */ (function () {
         this.data.id_medico = data.id_medico;
         //this.checkRango = this.verificarRangoDeFechasPorCita(this.data.fecha_consulta,this.data.hora_inicio,this.data.hora_fin)
         //alert(this.checkRango)
-        alert("id_medico: " + this.data.booking_id);
+        //alert("id de la cita: "+this.data.booking_id)
     };
     ModalPage.prototype.verificarRangoDeFechasPorCita = function (fecha, startHour, endHour) {
         var startTime;

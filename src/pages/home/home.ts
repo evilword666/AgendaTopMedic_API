@@ -386,7 +386,7 @@ checarCambiosNotificacionesRecibidas(){
 
     let options = new RequestOptions({ headers: headers });
 
-    var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/token/7';
+    var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/token/'+window.localStorage.getItem("id_API_medico");
     var credentials = JSON.stringify({"token_firebase":localStorage.getItem("phoneToken"),"uid_phone":localStorage.getItem("UUID_Phone")});
 
 
@@ -471,15 +471,15 @@ checarCambiosNotificacionesRecibidas(){
     //alert(JSON.stringify(typeof(dict)))
     //alert(JSON.stringify(typeof(dict2)))
     //alert(JSON.stringify(typeof(dict3)))
-    alert(JSON.stringify(persons['p1']))
+    //alert((Math.floor(Math.random() * 6) + 1 ).toString)
 
     var credentials = JSON.stringify({
 
       "fecha_cita": "2019-05-30",
       "hora_inicio": "13:00:00",
       "hora_final": "13:30:00",
-      "Paciente":persons['p1']
-
+      //"Paciente": Math.floor(Math.random() * 6) + 1  
+      "Paciente": 6
     });
 
     try {
