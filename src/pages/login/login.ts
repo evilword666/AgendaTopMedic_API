@@ -175,9 +175,12 @@ export class LoginPage {
             console.log(data)
             this.data.response = data["_body"]; 
             var resp = JSON.parse(this.data.response);
+            //alert(JSON.stringify(resp))
+            //alert(resp['user']['id'])
 
                 window.localStorage.setItem("user", String(this.user));  
                 window.localStorage.setItem("pass", String(this.pass));  
+                window.localStorage.setItem("id_API_medico", String(resp['user']['id']));  
            
                 let key = String(resp['key']);
    
