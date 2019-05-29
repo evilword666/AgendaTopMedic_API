@@ -134,6 +134,7 @@ var ModalPage = /** @class */ (function () {
         this.data.padecimiento = '';
         ;
         this.data.nombre_completo_paciente = '';
+        this.data.id_medico = '';
     }
     ModalPage.prototype.eliminarCitaAler = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -175,13 +176,19 @@ var ModalPage = /** @class */ (function () {
     };
     ModalPage.prototype.eliminarCitaDB = function () {
         var _this = this;
-        var link = 'https://topmedic.com.mx/accessDatabase/wp_DB/service/recibirDatos.php';
-        var credentials = JSON.stringify({ booking_key_delete: this.data.link_token_original });
+        var headers = new __WEBPACK_IMPORTED_MODULE_5__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', 'Token ' + window.localStorage.getItem("id_doctor"));
+        var options = new __WEBPACK_IMPORTED_MODULE_5__angular_http__["d" /* RequestOptions */]({ headers: headers });
+        var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/citas/' + this.data.booking_id;
+        //var credentials = JSON.stringify({id : this.data.link_token_original});
+        alert(options);
         try {
-            this.http.post(link, credentials)
+            this.http.delete(link, options)
                 .subscribe(function (data) {
                 _this.data.response = data["_body"];
                 var resp = JSON.parse(_this.data.response);
+                alert("Respuesta: \n\n" + data);
                 //alert(resp['id'])
                 //alert(resp['response'])
                 if (resp['response'] == "200") {
@@ -192,6 +199,8 @@ var ModalPage = /** @class */ (function () {
                     //this.exitoLogin();
                 }
             }, function (error) {
+                alert("Error: " + error);
+                console.log(error);
                 console.log("Oooops!");
                 alert("No se pudieron enviar los datos\nIntentelo mas tarde");
             });
@@ -232,8 +241,10 @@ var ModalPage = /** @class */ (function () {
         this.data.Sexo = data.Sexo;
         this.data.padecimiento = data.padecimiento;
         this.data.nombre_completo_paciente = data.nombre_completo_paciente;
+        this.data.id_medico = data.id_medico;
         //this.checkRango = this.verificarRangoDeFechasPorCita(this.data.fecha_consulta,this.data.hora_inicio,this.data.hora_fin)
         //alert(this.checkRango)
+        alert("id_medico: " + this.data.booking_id);
     };
     ModalPage.prototype.verificarRangoDeFechasPorCita = function (fecha, startHour, endHour) {
         var startTime;

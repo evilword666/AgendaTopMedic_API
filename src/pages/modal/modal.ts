@@ -5,7 +5,7 @@ import { Platform } from 'ionic-angular';
 import { HomePage} from  '../home/home';
 import { ModificarCitaPage } from  '../modificar-cita/modificar-cita';
 import { DatePicker } from '@ionic-native/date-picker';
-import {Http, Headers } from '@angular/http';
+import {Http, Headers,RequestOptions } from '@angular/http';
 
 
 /**
@@ -53,7 +53,7 @@ export class ModalPage {
     this.data.Sexo='';;
     this.data.padecimiento='';;
     this.data.nombre_completo_paciente='';
-
+    this.data.id_medico='';
   }
 
 
@@ -85,19 +85,27 @@ export class ModalPage {
   }
 
   eliminarCitaDB(){
-    var link = 'https://topmedic.com.mx/accessDatabase/wp_DB/service/recibirDatos.php';            
-    var credentials = JSON.stringify({booking_key_delete : this.data.link_token_original});
-    
+
+    const headers = new Headers()
+    headers.append('Content-Type','application/json')
+    headers.append('Authorization','Token '+window.localStorage.getItem("id_doctor")) 
+
+    let options = new RequestOptions({ headers: headers });
+    var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/citas/'+this.data.booking_id;           
+    //var credentials = JSON.stringify({id : this.data.link_token_original});
+    alert(options)
+
     try {
     
-
-    this.http.post(link, credentials)                  
+    this.http.delete(link,options)                  
     .subscribe(data => {
-      
 
       this.data.response = data["_body"]; 
 
       var resp = JSON.parse(this.data.response);
+
+      alert("Respuesta: \n\n"+data)
+
       //alert(resp['id'])
       //alert(resp['response'])
       
@@ -109,6 +117,8 @@ export class ModalPage {
             //this.exitoLogin();
           }
       }, error => {
+        alert("Error: "+error)
+        console.log(error)
         console.log("Oooops!");
         alert("No se pudieron enviar los datos\nIntentelo mas tarde");          
       });
@@ -155,8 +165,10 @@ export class ModalPage {
     this.data.Sexo=data.Sexo;
     this.data.padecimiento=data.padecimiento;
     this.data.nombre_completo_paciente=data.nombre_completo_paciente;
+    this.data.id_medico=data.id_medico;
     //this.checkRango = this.verificarRangoDeFechasPorCita(this.data.fecha_consulta,this.data.hora_inicio,this.data.hora_fin)
     //alert(this.checkRango)
+    //alert("id de la cita: "+this.data.booking_id)
   }
 
   verificarRangoDeFechasPorCita(fecha,startHour,endHour){

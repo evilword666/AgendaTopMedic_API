@@ -22,7 +22,7 @@ export class DatabaseProvider {
 
     if (!this.isOpen) {
       this.storage = new SQLite();
-      this.storage.create({ name: "topmedic10.db", location: "default" }).then((db: SQLiteObject) => {
+      this.storage.create({ name: "topmedic11.db", location: "default" }).then((db: SQLiteObject) => {
         this.db = db;
 /*
         db.executeSql("CREATE TABLE IF NOT EXISTS tb_datos_Pacientes (id INTEGER PRIMARY KEY AUTOINCREMENT, fecha_consulta text, hora text, horb text, descripcion text, link_token text, tipo_servicio text, booking_id text,edad_paciente text,Sexo text,padecimiento text, nombre_completo_paciente text)", []).then(()=>{
@@ -34,7 +34,7 @@ export class DatabaseProvider {
             }).catch((err)=>console.log("Error al tratar de crear la tabla tb_citas_pacientes", err));
         }).catch((err)=>console.log("Error al crear la tabla tb_datos_Pacientes", err));
 */
-db.executeSql("CREATE TABLE IF NOT EXISTS tb_datos_citas_pacientes (id INTEGER PRIMARY KEY AUTOINCREMENT, id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text)", []).then(()=>{
+db.executeSql("CREATE TABLE IF NOT EXISTS tb_datos_citas_pacientes (id INTEGER PRIMARY KEY AUTOINCREMENT, id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_medico text, id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text)", []).then(()=>{
     console.log("Tabla tb_citas_medicos creada exitosamente!")
 }).catch((err)=>console.log("Error al tratar de crear la tabla tb_horarios_medicos", err));
 
@@ -51,14 +51,14 @@ db.executeSql("CREATE TABLE IF NOT EXISTS tb_datos_citas_pacientes (id INTEGER P
 /***********************************************************************************************************/
 /***************************** Funciones para almacenar datos la primera vez *******************************/
 /***********************************************************************************************************/
-almacenarCitasEnBD(id_cita: string, fecha_cita:string, hora_inicio:string, hora_final: string, enlace_videochat: string,tipo_servicio:string, descripcion:string, antecedentes_principales: string, id_paciente:string, nombre: string,apellido_paterno:string,apellido_materno:string, sexo:string, edad:string, numCitas:number ){
-    console.log("Desde funcion de almacenamiento: \nid_cita: "+id_cita+" \nfecha_cita: "+fecha_cita+" "+" \nhora_inicio: "+hora_inicio+" \nhora_final: "+hora_final+" \nenlace_videochat: "+enlace_videochat+"\ntipo_servicio: "+tipo_servicio+"\ndescripcion: "+descripcion+" \nantecedentes_principales: "+antecedentes_principales+" \nid_paciente: "+id_paciente+" \nnombre: "+nombre+" \napellido_paterno: "+apellido_paterno+"  \napellido_materno: "+apellido_materno+"   \nsexo: "+sexo+"   \nedad: "+edad+" ")
+almacenarCitasEnBD(id_cita: string, fecha_cita:string, hora_inicio:string, hora_final: string, enlace_videochat: string,tipo_servicio:string, descripcion:string, antecedentes_principales: string, id_medico: string,id_paciente:string, nombre: string,apellido_paterno:string,apellido_materno:string, sexo:string, edad:string, numCitas:number ){
+    console.log("Desde funcion de almacenamiento: \nid_cita: "+id_cita+" \nfecha_cita: "+fecha_cita+" "+" \nhora_inicio: "+hora_inicio+" \nhora_final: "+hora_final+" \nenlace_videochat: "+enlace_videochat+"\ntipo_servicio: "+tipo_servicio+"\ndescripcion: "+descripcion+" \nantecedentes_principales: "+antecedentes_principales+"\nid_medico: "+id_medico+" \nid_paciente: "+id_paciente+" \nnombre: "+nombre+" \napellido_paterno: "+apellido_paterno+"  \napellido_materno: "+apellido_materno+"   \nsexo: "+sexo+"   \nedad: "+edad+" ")
 
     return new Promise ((resolve, reject) => {
       //id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text   
       //id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text)"
-      let sql = "INSERT INTO tb_datos_citas_pacientes (id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat,tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno,apellido_materno,sexo,edad) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-      this.db.executeSql(sql, [id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat,tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno,apellido_materno,sexo,edad]).then((data) =>{
+      let sql = "INSERT INTO tb_datos_citas_pacientes (id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat,tipo_servicio, descripcion, antecedentes_principales, id_medico, id_paciente, nombre, apellido_paterno,apellido_materno,sexo,edad) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      this.db.executeSql(sql, [id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat,tipo_servicio, descripcion, antecedentes_principales,id_medico, id_paciente, nombre, apellido_paterno,apellido_materno,sexo,edad]).then((data) =>{
       //Aqui iba el resolve  
         //alert("Insercion correcta: "+data)
         //console.log("Duda CONVERTIDA: "+JSON.stringify(data))
@@ -96,6 +96,7 @@ almacenarCitasEnBD(id_cita: string, fecha_cita:string, hora_inicio:string, hora_
               tipo_servicio: data.rows.item(i).tipo_servicio,
               descripcion: data.rows.item(i).descripcion,
               antecedentes_principales: data.rows.item(i).antecedentes_principales,
+              id_medico: data.rows.item(i).id_medico,
               id_paciente: data.rows.item(i).id_paciente,
               nombre: data.rows.item(i).nombre,
               apellido_paterno: data.rows.item(i).apellido_paterno,
@@ -141,6 +142,7 @@ obtenerCamposCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,h
             tipo_servicio: data.rows.item(i).tipo_servicio,
             descripcion: data.rows.item(i).descripcion,
             antecedentes_principales: data.rows.item(i).antecedentes_principales,
+            id_medico: data.rows.item(i).id_medico,
             id_paciente: data.rows.item(i).id_paciente,
             nombre: data.rows.item(i).nombre,
             apellido_paterno: data.rows.item(i).apellido_paterno,
@@ -175,6 +177,7 @@ limpiarTabla(){
               tipo_servicio: data.rows.item(i).tipo_servicio,
               descripcion: data.rows.item(i).descripcion,
               antecedentes_principales: data.rows.item(i).antecedentes_principales,
+              id_medico: data.rows.item(i).id_medico,
               id_paciente: data.rows.item(i).id_paciente,
               nombre: data.rows.item(i).nombre,
               apellido_paterno: data.rows.item(i).apellido_paterno,
@@ -199,7 +202,6 @@ limpiarTabla(){
 /***************************** Funciones para almacenar tabla con datos obtenidos del API ******************/
 /***********************************************************************************************************/
 almacenarHorariosCitasEnBDconAPI(id: string, fecha_cita:string, titulo:string, descripcion: string, hora_inicio: string,hora_final: string,color: string,sub_color: string,enlace_videochat: string,enlace_cita: string,status: string, Paciente: string, Doctor: string, numCitas:number ){
-  console.log("Desde funcion de almacenamiento: \nId: "+id+" \fecha_cita: "+fecha_cita+" \titulo: "+titulo+" "+" \ndescripcion: "+descripcion+" \nhora_inicio: "+hora_inicio+" \nhora_final: "+hora_final+" \ncolor: "+color+" \nsub_color: "+sub_color+" \nenlace_videochat: "+enlace_videochat+" \nenlace_cita: "+enlace_cita+" \nstatus: "+status+" \nPaciente: "+Paciente+" \nDoctor: "+Doctor+" \nnumCitas: "+numCitas+"")
 
   return new Promise ((resolve, reject) => {
                                 

@@ -386,7 +386,7 @@ checarCambiosNotificacionesRecibidas(){
 
     let options = new RequestOptions({ headers: headers });
 
-    var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/token/2';
+    var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/token/7';
     var credentials = JSON.stringify({"token_firebase":localStorage.getItem("phoneToken"),"uid_phone":localStorage.getItem("UUID_Phone")});
 
 
@@ -399,17 +399,17 @@ checarCambiosNotificacionesRecibidas(){
       this.data.response = data["_body"]; 
       var resp = JSON.parse(this.data.response);
 
-        alert(resp)
+        //alert(JSON.stringify(resp))
 
       }, error => {
         //alert(error)
         console.log(error)
-        alert("Error")
-        alert(error)
+        //alert("Error")
+        //alert(JSON.stringify(error))
         //alert(error['status']) //Nos da el codigo del tipo de error 
 
         let stringError = error+" ";
-        let typeError = stringError.indexOf("401") > -1; //Buscamos la subcadena 401 que indica error de credenciales, devuelve un booleano
+        let typeError = stringError.indexOf("401") > -1; //Buscamos la subcadena 401 que indica error de credenciales, devuelve un booleano true si lo encuentra
 
         //Aqui clasificaremos los errores obtenidos en el servidor
         if(error['status'] == "401"){
@@ -431,14 +431,105 @@ checarCambiosNotificacionesRecibidas(){
     }
           
   }
+  /**************************************************************************************************************/
+  /**************************************************************************************************************/            
+  /**************************************************************************************************************/            
 
+  agregarCitaManualmente(){
+    
+    const headers = new Headers()
+    headers.append('Content-Type','application/json')
+    headers.append('Authorization','Token '+window.localStorage.getItem("id_doctor")) //Aqui se agrega el key del medico obtenido del login
+
+
+    let options = new RequestOptions({ headers: headers });
+
+    var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/citas/';
+    //var credentials = JSON.stringify({"token_firebase":localStorage.getItem("phoneToken"),"uid_phone":localStorage.getItem("UUID_Phone")});
+    
+    var dict2 = []; 
+    dict2.push({
+      "id":"7",
+    });
+
+
+    var dict = new Object();
+    dict = {
+      "id": "7"
+    };
+    
+    var dict3 = { "id": "7"};
+
+    interface IPerson {
+      id: string;
+   }
+   
+   var persons: { [id: string]: IPerson; } = {
+    "p1": { id: "7" }
+ };
+
+    //alert(JSON.stringify(typeof(dict)))
+    //alert(JSON.stringify(typeof(dict2)))
+    //alert(JSON.stringify(typeof(dict3)))
+    alert(JSON.stringify(persons['p1']))
+
+    var credentials = JSON.stringify({
+
+      "fecha_cita": "2019-05-30",
+      "hora_inicio": "13:00:00",
+      "hora_final": "13:30:00",
+      "Paciente":persons['p1']
+
+    });
+
+    try {
+
+    this.http.post(link, credentials,options)                  
+    .subscribe(data => {
+
+      console.log(data)
+      this.data.response = data["_body"]; 
+      var resp = JSON.parse(this.data.response);
+
+        alert(JSON.stringify(resp))
+
+      }, error => {
+        //alert(error)
+        console.log(error)
+        alert("Error")
+        alert(JSON.stringify(error))
+        //alert(error['status']) //Nos da el codigo del tipo de error 
+
+        let stringError = error+" ";
+        let typeError = stringError.indexOf("401") > -1; //Buscamos la subcadena 401 que indica error de credenciales, devuelve un booleano true si lo encuentra
+
+        //Aqui clasificaremos los errores obtenidos en el servidor
+        if(error['status'] == "401"){
+          //this.errorLogin()
+        }else if(error['status'] == "0"){
+          //this.errorConexion();
+        }else if(error['status'] == "429"){
+          //this.errorUsuarioBaneado()
+        }
+  
+        console.log("Oooops!");
+        this.loading.dismiss(); 
+
+      });
+
+    } catch (error) {
+      //console.log("Catch: "+error)
+      alert("Hay un error en el servidor")
+    }
+          
+  }
 /**************************************************************************************************************/
 /**************************************************************************************************************/
 /**************************************************************************************************************/  
      
-almacenarHorariosEnLocalBD(id_cita: string, fecha_cita:string, hora_inicio:string, hora_final: string, enlace_videochat: string,tipo_servicio:string, descripcion:string, antecedentes_principales: string, id_paciente:string, nombre: string,apellido_paterno:string,apellido_materno:string, sexo:string, edad:string, numCitas:number ){
+almacenarHorariosEnLocalBD(id_cita: string, fecha_cita:string, hora_inicio:string, hora_final: string, enlace_videochat: string,tipo_servicio:string, descripcion:string, antecedentes_principales: string, id_medico:string, id_paciente:string, nombre: string,apellido_paterno:string,apellido_materno:string, sexo:string, edad:string, numCitas:number ){
  //alert("Entrando a la funcion de almacenamieto")
-  this.database.almacenarCitasEnBD(id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat,tipo_servicio, descripcion, antecedentes_principales, id_paciente, nombre, apellido_paterno,apellido_materno,sexo,edad, numCitas).then((data) =>{                
+  this.database.almacenarCitasEnBD(id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat,tipo_servicio, descripcion, antecedentes_principales, id_medico, id_paciente, nombre, apellido_paterno,apellido_materno,sexo,edad, numCitas).then((data) =>{                
         //console.log(JSON.stringify("Numero de datos insertados: "+data))
         
         if(JSON.stringify(data) == numCitas+""){
@@ -521,6 +612,7 @@ getDetallesCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,hor
               var tipo_servicio = JSON.stringify(element['tipo_servicio'])
               var descripcion = JSON.stringify(element['descripcion'])
               var antecedentes_principales = JSON.stringify(element['antecedentes_principales'])
+              var id_medico = JSON.stringify(element['id_medico'])
               var id_paciente = JSON.stringify(element['id_paciente'])
               var nombre = JSON.stringify(element['nombre'])
               var apellido_paterno = JSON.stringify(element['apellido_paterno'])
@@ -539,6 +631,7 @@ getDetallesCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,hor
               var tipo_servicio_SC = tipo_servicio.replace(/"/g, '');
               var descripcion_SC = descripcion.replace(/"/g, '');
               var antecedentes_principales_SC = antecedentes_principales.replace(/"/g, '');
+              var id_medico_SC = id_medico.replace(/"/g, '');
               var id_paciente_SC = id_paciente.replace(/"/g, '');
               var nombre_SC = nombre.replace(/"/g, '');
               var apellido_paterno_SC = apellido_paterno.replace(/"/g, '');
@@ -557,7 +650,8 @@ getDetallesCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,hor
                 "edad_paciente":edad_SC,
                 "Sexo":sexo_SC,
                 "padecimiento":antecedentes_principales_SC,
-                "nombre_completo_paciente":nombre_SC+" "+apellido_paterno_SC+" "+apellido_materno_SC
+                "nombre_completo_paciente":nombre_SC+" "+apellido_paterno_SC+" "+apellido_materno_SC,
+                "id_medico":id_medico_SC
               };
 
               //alert(typeof(objectNotification))
@@ -609,6 +703,7 @@ getDetallesCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,hor
                 var tipo_servicio = JSON.stringify(element['tipo_servicio'])
                 var descripcion = JSON.stringify(element['descripcion'])
                 var antecedentes_principales = JSON.stringify(element['antecedentes_principales'])
+                var id_medico = JSON.stringify(element['Doctor'])
                 var id_paciente = JSON.stringify(element['Paciente']['id'])
                 var nombre = JSON.stringify(element['Paciente']['nombre'])
                 var apellido_paterno = JSON.stringify(element['Paciente']['apellido_paterno'])
@@ -627,6 +722,7 @@ getDetallesCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,hor
                 var tipo_servicio_SC = tipo_servicio.replace(/"/g, '');
                 var descripcion_SC = descripcion.replace(/"/g, '');
                 var antecedentes_principales_SC = antecedentes_principales.replace(/"/g, '');
+                var id_medico_SC = id_medico.replace(/"/g, '');
                 var id_paciente_SC = id_paciente.replace(/"/g, '');
                 var nombre_SC = nombre.replace(/"/g, '');
                 var apellido_paterno_SC = apellido_paterno.replace(/"/g, '');
@@ -637,7 +733,7 @@ getDetallesCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,hor
                 //alert("Datos a almacenar...")
                 //alert("id_cita: "+id_cita_SC+" \nfecha_cita: "+fecha_cita_SC+" \nhora_inicio: "+hora_inicio_SC+" \nhora_final: "+hora_final_SC+" \nenlace_videochat: "+enlace_videochat_SC+" \ntipo_servicio: "+tipo_servicio_SC+" \ndescripcion: "+descripcion_SC+" \nantecedentes_principales"+antecedentes_principales_SC+" \nid_paciente: "+id_paciente_SC+" \nnombre: "+nombre_SC+" \napellido_paterno: "+apellido_paterno_SC+" \napellido_materno: "+apellido_materno_SC+" \nsexo:"+sexo_SC+" \nedad: "+edad_SC)
                 
-                this.almacenarHorariosEnLocalBD(id_cita_SC, fecha_cita_SC, hora_inicio_SC, hora_final_SC, enlace_videochat_SC,tipo_servicio_SC, descripcion_SC, antecedentes_principales_SC, id_paciente_SC, nombre_SC, apellido_paterno_SC,apellido_materno_SC,sexo_SC,edad_SC, nFilas);
+                this.almacenarHorariosEnLocalBD(id_cita_SC, fecha_cita_SC, hora_inicio_SC, hora_final_SC, enlace_videochat_SC,tipo_servicio_SC, descripcion_SC, antecedentes_principales_SC, id_medico_SC, id_paciente_SC, nombre_SC, apellido_paterno_SC,apellido_materno_SC,sexo_SC,edad_SC, nFilas);
             }
             window.localStorage.setItem("numFilasDBremota",window.localStorage.getItem("numFilasDBActual"))
 //        }else{
