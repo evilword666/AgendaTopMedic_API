@@ -7,6 +7,7 @@ webpackJsonp([4],{
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CrearCitaPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(32);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -18,6 +19,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 
 
+
 /**
  * Generated class for the CrearCitaPage page.
  *
@@ -25,25 +27,115 @@ var __metadata = (this && this.__metadata) || function (k, v) {
  * Ionic pages and navigation.
  */
 var CrearCitaPage = /** @class */ (function () {
-    function CrearCitaPage(navCtrl, navParams) {
+    function CrearCitaPage(navCtrl, navParams, http) {
         this.navCtrl = navCtrl;
         this.navParams = navParams;
+        this.http = http;
+        this.data = {};
         this.fechaNuevoInicioCita = new Date().toISOString();
         this.fechaNuevoFinCita = new Date().toISOString();
     }
     CrearCitaPage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad CrearCitaPage');
+        //this.consultarHorariosOcupados()
     };
     CrearCitaPage.prototype.cancelar = function () {
         this.navCtrl.pop();
     };
+    CrearCitaPage.prototype.consultarHorariosOcupados = function () {
+        var _this = this;
+        var headers = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', 'Token ' + window.localStorage.getItem("id_doctor")); //Aqui se agrega el key del medico obtenido del login
+        var options = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["d" /* RequestOptions */]({ headers: headers });
+        var link = 'http://104.248.176.189:8001/api/v1/doctor/horarios/';
+        try {
+            this.http.get(link, options)
+                .subscribe(function (data) {
+                console.log(data);
+                _this.data.response = data["_body"];
+                var resp = JSON.parse(_this.data.response);
+                alert(JSON.stringify(resp));
+            }, function (error) {
+                //alert(error)
+                console.log(error);
+                alert("Error");
+                alert(JSON.stringify(error));
+                //alert(error['status']) //Nos da el codigo del tipo de error 
+                var stringError = error + " ";
+                var typeError = stringError.indexOf("401") > -1; //Buscamos la subcadena 401 que indica error de credenciales, devuelve un booleano true si lo encuentra
+                //Aqui clasificaremos los errores obtenidos en el servidor
+                if (error['status'] == "401") {
+                    //this.errorLogin()
+                }
+                else if (error['status'] == "0") {
+                    //this.errorConexion();
+                }
+                else if (error['status'] == "429") {
+                    //this.errorUsuarioBaneado()
+                }
+                console.log("Oooops!");
+            });
+        }
+        catch (error) {
+            //console.log("Catch: "+error)
+            alert("Hay un error en el servidor");
+        }
+    };
+    CrearCitaPage.prototype.agregarCitaManualmente = function () {
+        var _this = this;
+        var headers = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["a" /* Headers */]();
+        headers.append('Content-Type', 'application/json');
+        headers.append('Authorization', 'Token ' + window.localStorage.getItem("id_doctor")); //Aqui se agrega el key del medico obtenido del login
+        var options = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["d" /* RequestOptions */]({ headers: headers });
+        var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/citas/';
+        var credentials = JSON.stringify({
+            "fecha_cita": "2019-05-30",
+            "hora_inicio": "13:00:00",
+            "hora_final": "13:30:00",
+            "Paciente": 6
+        });
+        try {
+            this.http.post(link, credentials, options)
+                .subscribe(function (data) {
+                console.log(data);
+                _this.data.response = data["_body"];
+                var resp = JSON.parse(_this.data.response);
+                //alert(JSON.stringify(resp))
+            }, function (error) {
+                //alert(error)
+                console.log(error);
+                alert("Error");
+                alert(JSON.stringify(error));
+                //alert(error['status']) //Nos da el codigo del tipo de error 
+                var stringError = error + " ";
+                var typeError = stringError.indexOf("401") > -1; //Buscamos la subcadena 401 que indica error de credenciales, devuelve un booleano true si lo encuentra
+                //Aqui clasificaremos los errores obtenidos en el servidor
+                if (error['status'] == "401") {
+                    //this.errorLogin()
+                }
+                else if (error['status'] == "0") {
+                    //this.errorConexion();
+                }
+                else if (error['status'] == "429") {
+                    //this.errorUsuarioBaneado()
+                }
+                console.log("Oooops!");
+            });
+        }
+        catch (error) {
+            //console.log("Catch: "+error)
+            alert("Hay un error en el servidor");
+        }
+    };
     CrearCitaPage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: 'page-crear-cita',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/crear-cita/crear-cita.html"*/'<!--\n  Generated template for the CrearCitaPage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>crearCita</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content text-center>\n\n\n  <ion-list> \n    \n      <ion-item>\n          <ion-label floating>Paciente</ion-label>\n          <ion-input type="text" [(ngModel)]="paciente"></ion-input>\n        </ion-item>\n    \n    <ion-item>\n      <ion-label floating>Fecha de inicio</ion-label>\n      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoInicioCita"></ion-datetime>\n    </ion-item>\n  \n    <ion-item>        \n      <ion-label floating>Fecha de fin</ion-label>\n      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoFinCita"></ion-datetime>     \n    </ion-item>        \n    \n    <ion-item>\n        <ion-label floating>Tipo de consulta</ion-label>\n        <ion-input type="text" [(ngModel)]="tipoConsulta"></ion-input>\n      </ion-item>\n\n      <ion-item>\n          <ion-label floating>Tipo de pago</ion-label>\n          <ion-input type="text" [(ngModel)]="tipoPago"></ion-input>\n        </ion-item>\n\n      <p></p>\n  \n  </ion-list>\n  \n  <button ion-button outline item-end icon-left  color="Primary" (click)="cancelar()">Aceptar <br>\n    \n  </button>\n\n  <button ion-button outline item-end icon-left  color="Primary" (click)="cancelar()">Cancelar <br>\n   \n  </button>\n\n</ion-content>\n'/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/crear-cita/crear-cita.html"*/,
+            selector: 'page-crear-cita',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/crear-cita/crear-cita.html"*/'<!--\n  Generated template for the CrearCitaPage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>crearCita</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content text-center>\n\n\n  <ion-list> \n    \n      <ion-item>\n          <ion-label floating>Paciente</ion-label>\n          <ion-input type="text" [(ngModel)]="paciente"></ion-input>\n        </ion-item>\n    \n    <ion-item>\n      <ion-label floating>Fecha de inicio</ion-label>\n      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoInicioCita"></ion-datetime>\n    </ion-item>\n  \n    <ion-item>        \n      <ion-label floating>Fecha de fin</ion-label>\n      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoFinCita"></ion-datetime>     \n    </ion-item>        \n    \n    <ion-item>\n        <ion-label floating>Tipo de consulta</ion-label>\n        <ion-input type="text" [(ngModel)]="tipoConsulta"></ion-input>\n      </ion-item>\n\n      <ion-item>\n          <ion-label floating>Tipo de pago</ion-label>\n          <ion-input type="text" [(ngModel)]="tipoPago"></ion-input>\n        </ion-item>\n\n      <p></p>\n  \n  </ion-list>\n  \n  <button ion-button outline item-end icon-left  color="Primary" (click)="agregarCitaManualmente()">Aceptar <br>\n    \n  </button>\n\n  <button ion-button outline item-end icon-left  color="Primary" (click)="cancelar()">Cancelar <br></button>\n  \n  <button ion-button item-end icon-left  color="Primary" (click)="consultarHorariosOcupados()">Horarios Ocupados<br></button>\n  \n  \n</ion-content>\n'/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/crear-cita/crear-cita.html"*/,
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */]])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */]) === "function" && _c || Object])
     ], CrearCitaPage);
     return CrearCitaPage;
+    var _a, _b, _c;
 }());
 
 //# sourceMappingURL=crear-cita.js.map
@@ -57,7 +149,7 @@ var CrearCitaPage = /** @class */ (function () {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return LoginPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__home_home__ = __webpack_require__(157);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -306,7 +398,7 @@ module.exports = webpackAsyncContext;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return HomePage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__providers_database_database__ = __webpack_require__(158);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_background_mode__ = __webpack_require__(82);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_native_audio__ = __webpack_require__(161);
@@ -736,7 +828,8 @@ var HomePage = /** @class */ (function () {
         this.database.almacenarCitasEnBD(id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat, tipo_servicio, descripcion, antecedentes_principales, id_medico, id_paciente, nombre, apellido_paterno, apellido_materno, sexo, edad, numCitas).then(function (data) {
             //console.log(JSON.stringify("Numero de datos insertados: "+data))
             if (JSON.stringify(data) == numCitas + "") {
-                //alert("Se agregaron todas las citas de la BD remota a la DB local")
+                alert("Se agregaron todas las citas de la BD remota a la DB local");
+                console.log("Se agregaron las " + JSON.stringify(data) + "citas de la BD remota a la DB local");
                 _this.getCitas();
             }
         }, function (error) {
@@ -856,10 +949,12 @@ var HomePage = /** @class */ (function () {
             //this.horarios_medico = this.resp['results'];//Datos de usuarios
             //alert(JSON.stringify(this.horarios_medico[0]['Paciente']['id']))
             var resp2 = this.horarios_medico['results'];
-            var nFilas = JSON.parse(this.numeroFilas);
+            //var nFilas = JSON.parse(this.numeroFilas);
+            var nFilas = Object.keys(resp2).length;
+            console.log(resp2);
             console.log("Se agregaran " + nFilas + " nuevas filas\n\n\nElementos pos[0]: " + JSON.stringify(resp2[0]) + " \n\n\nElementos pos[1]: " + JSON.stringify(resp2[1]));
             //alert("Se agregaran "+nFilas+" nuevas filas\n\n\nElementos pos[0]: "+JSON.stringify(resp2[0])+" \n\n\nElementos pos[1]: "+JSON.stringify(resp2[1]))
-            //alert(Object.keys(resp2).length)
+            alert(Object.keys(resp2).length);
             //        if(this.resp['respValue'] == "200"){
             for (var i = 0; i < Object.keys(resp2).length; i++) {
                 //for (let i = 0; i < nFilas; i++) {
@@ -1110,12 +1205,11 @@ var HomePage = /** @class */ (function () {
     };
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: 'page-home',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/home/home.html"*/'<ion-header>\n  <ion-navbar color="primary">\n      <ion-title>{{viewTitle}}</ion-title>\n      <ion-buttons end>\n          <!--<button ion-button (click)="loadEvents()">Load</button>-->\n          <!--<button ion-button (click)="clearCalendar()">Clear</button>-->\n          \n          <button ion-button [disabled]="isToday" (click)="today()">Hoy</button>\n          <button ion-button (click)="changeMode(\'month\')">M</button>\n          <button ion-button (click)="changeMode(\'week\')">S</button>\n          <button ion-button (click)="changeMode(\'day\')">D</button>\n       \n      </ion-buttons>\n  </ion-navbar>\n</ion-header>\n\n<ion-content class="has-header">\n  <calendar [eventSource]="eventSource"\n            [calendarMode]="calendar.mode"\n            [currentDate]="calendar.currentDate"\n            [locale]="calendar.locale"\n            \n            (onCurrentDateChanged)="onCurrentDateChanged($event)"\n            (onEventSelected)="onEventSelected($event)"\n            (onTitleChanged)="onViewTitleChanged($event)"\n            (onTimeSelected)="onTimeSelected($event)"\n            step="30">\n  </calendar>    \n\n  <!-- <button ion-button block (click)="createUser();"> Crear usuario</button>\n  <button ion-button block secondary round (click)="updateCalendar1();"> update Calendar OPC 1</button> \n  <button ion-button block round (click)="updateCalendar2();"> update Calendar OPC 2</button>\n  \n  <button ion-button block color="tem" round (click)="updateCalendar3();"> update Calendar OPC 3</button>\n\n  <button ion-button block (click)="consultarHorariosBDremota();"> Consultar horarios BD remota</button>\n\n  \n  <button ion-button block (click)="clearTable();"> Vaciar base de datos</button>\n  \n  <button ion-button block color="sec" (click)="getCitas();"> Obtener citas de la BD</button>\n  \n  <button ion-button (click)="playAudio()">Play audio</button>\n  \n  <button ion-button (click)="lanzarNotificacion()">Lanzar notificacion</button>\n  <button ion-button (click)="lanzarNotificacion2()">Lanzar notificacion 2</button>\n-->\n  \n<ion-fab right bottom #fab >\n    <button ion-fab (click)="actualizarAgenda()">\n        <ion-icon name="md-refresh" large></ion-icon>\n        <!-- <ion-img src="img/update2.png"></ion-img> -->\n     </button>\n  </ion-fab>\n\n  \n  <ion-fab left bottom #fab >\n    <!--<button ion-fab (click)="agregarCita()">-->\n    <button ion-fab (click)="agregarCitaManualmente()">\n        \n        <ion-icon name="md-add" large></ion-icon>\n     </button>\n\n  </ion-fab>\n\n</ion-content>\n\n'/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/home/home.html"*/
+            selector: 'page-home',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/home/home.html"*/'<ion-header>\n  <ion-navbar color="primary">\n      <ion-title>{{viewTitle}}</ion-title>\n      <ion-buttons end>\n          <!--<button ion-button (click)="loadEvents()">Load</button>-->\n          <!--<button ion-button (click)="clearCalendar()">Clear</button>-->\n          \n          <button ion-button [disabled]="isToday" (click)="today()">Hoy</button>\n          <button ion-button (click)="changeMode(\'month\')">M</button>\n          <button ion-button (click)="changeMode(\'week\')">S</button>\n          <button ion-button (click)="changeMode(\'day\')">D</button>\n       \n      </ion-buttons>\n  </ion-navbar>\n</ion-header>\n\n<ion-content class="has-header">\n  <calendar [eventSource]="eventSource"\n            [calendarMode]="calendar.mode"\n            [currentDate]="calendar.currentDate"\n            [locale]="calendar.locale"\n            \n            (onCurrentDateChanged)="onCurrentDateChanged($event)"\n            (onEventSelected)="onEventSelected($event)"\n            (onTitleChanged)="onViewTitleChanged($event)"\n            (onTimeSelected)="onTimeSelected($event)"\n            step="30">\n  </calendar>    \n\n  <!-- <button ion-button block (click)="createUser();"> Crear usuario</button>\n  <button ion-button block secondary round (click)="updateCalendar1();"> update Calendar OPC 1</button> \n  <button ion-button block round (click)="updateCalendar2();"> update Calendar OPC 2</button>\n  \n  <button ion-button block color="tem" round (click)="updateCalendar3();"> update Calendar OPC 3</button>\n\n  <button ion-button block (click)="consultarHorariosBDremota();"> Consultar horarios BD remota</button>\n\n  \n  <button ion-button block (click)="clearTable();"> Vaciar base de datos</button>\n  \n  <button ion-button block color="sec" (click)="getCitas();"> Obtener citas de la BD</button>\n  \n  <button ion-button (click)="playAudio()">Play audio</button>\n  \n  <button ion-button (click)="lanzarNotificacion()">Lanzar notificacion</button>\n  <button ion-button (click)="lanzarNotificacion2()">Lanzar notificacion 2</button>\n-->\n  \n<ion-fab right bottom #fab >\n    <button ion-fab (click)="actualizarAgenda()">\n        <ion-icon name="md-refresh" large></ion-icon>\n        <!-- <ion-img src="img/update2.png"></ion-img> -->\n     </button>\n  </ion-fab>\n\n  \n  <ion-fab left bottom #fab >\n    <button ion-fab (click)="agregarCita()">\n    <!--<button ion-fab (click)="agregarCitaManualmente()">-->\n        <ion-icon name="md-add" large></ion-icon>\n     </button>\n\n  </ion-fab>\n\n</ion-content>\n\n'/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/home/home.html"*/
         }),
-        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* ModalController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* ModalController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_8__ionic_native_unique_device_id__["a" /* UniqueDeviceID */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_8__ionic_native_unique_device_id__["a" /* UniqueDeviceID */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_6__ionic_native_local_notifications__["a" /* LocalNotifications */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__ionic_native_local_notifications__["a" /* LocalNotifications */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_5__ionic_native_native_audio__["a" /* NativeAudio */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__ionic_native_native_audio__["a" /* NativeAudio */]) === "function" && _f || Object, typeof (_g = typeof __WEBPACK_IMPORTED_MODULE_4__ionic_native_background_mode__["a" /* BackgroundMode */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__ionic_native_background_mode__["a" /* BackgroundMode */]) === "function" && _g || Object, typeof (_h = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _h || Object, typeof (_j = typeof __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */]) === "function" && _j || Object, typeof (_k = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */]) === "function" && _k || Object, typeof (_l = typeof __WEBPACK_IMPORTED_MODULE_3__providers_database_database__["a" /* DatabaseProvider */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__providers_database_database__["a" /* DatabaseProvider */]) === "function" && _l || Object])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* ModalController */], __WEBPACK_IMPORTED_MODULE_8__ionic_native_unique_device_id__["a" /* UniqueDeviceID */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_6__ionic_native_local_notifications__["a" /* LocalNotifications */], __WEBPACK_IMPORTED_MODULE_5__ionic_native_native_audio__["a" /* NativeAudio */], __WEBPACK_IMPORTED_MODULE_4__ionic_native_background_mode__["a" /* BackgroundMode */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_3__providers_database_database__["a" /* DatabaseProvider */]])
     ], HomePage);
     return HomePage;
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
 }());
 
 //# sourceMappingURL=home.js.map
@@ -1181,7 +1275,7 @@ var DatabaseProvider = /** @class */ (function () {
     /***********************************************************************************************************/
     DatabaseProvider.prototype.almacenarCitasEnBD = function (id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat, tipo_servicio, descripcion, antecedentes_principales, id_medico, id_paciente, nombre, apellido_paterno, apellido_materno, sexo, edad, numCitas) {
         var _this = this;
-        console.log("Desde funcion de almacenamiento: \nid_cita: " + id_cita + " \nfecha_cita: " + fecha_cita + " " + " \nhora_inicio: " + hora_inicio + " \nhora_final: " + hora_final + " \nenlace_videochat: " + enlace_videochat + "\ntipo_servicio: " + tipo_servicio + "\ndescripcion: " + descripcion + " \nantecedentes_principales: " + antecedentes_principales + "\nid_medico: " + id_medico + " \nid_paciente: " + id_paciente + " \nnombre: " + nombre + " \napellido_paterno: " + apellido_paterno + "  \napellido_materno: " + apellido_materno + "   \nsexo: " + sexo + "   \nedad: " + edad + " ");
+        console.log("Desde funcion de almacenamiento en el provider: \nid_cita: " + id_cita + " \nfecha_cita: " + fecha_cita + " " + " \nhora_inicio: " + hora_inicio + " \nhora_final: " + hora_final + " \nenlace_videochat: " + enlace_videochat + "\ntipo_servicio: " + tipo_servicio + "\ndescripcion: " + descripcion + " \nantecedentes_principales: " + antecedentes_principales + "\nid_medico: " + id_medico + " \nid_paciente: " + id_paciente + " \nnombre: " + nombre + " \napellido_paterno: " + apellido_paterno + "  \napellido_materno: " + apellido_materno + "   \nsexo: " + sexo + "   \nedad: " + edad + " ");
         return new Promise(function (resolve, reject) {
             //id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text   
             //id_cita text, fecha_cita text, hora_inicio text, hora_final text, enlace_videochat text, tipo_servicio text, descripcion text,antecedentes_principales text,id_paciente text,nombre text, apellido_paterno text,apellido_materno text, sexo text, edad text)"
@@ -1480,7 +1574,7 @@ Object(__WEBPACK_IMPORTED_MODULE_0__angular_platform_browser_dynamic__["a" /* pl
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__pages_modificar_cita_modificar_cita__ = __webpack_require__(206);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__pages_crear_cita_crear_cita__ = __webpack_require__(104);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_ionic2_calendar__ = __webpack_require__(282);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__angular_http__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__angular_http__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__providers_database_database__ = __webpack_require__(158);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ionic_native_sqlite__ = __webpack_require__(159);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__ionic_native_background_mode__ = __webpack_require__(82);
