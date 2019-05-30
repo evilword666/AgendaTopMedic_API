@@ -7,7 +7,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>crearCita</ion-title>
+    <ion-title>Agendar nueva Cita</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -19,41 +19,85 @@
   <ion-list> 
     
       <ion-item>
-          <ion-label floating>Paciente</ion-label>
-          <ion-input type="text" [(ngModel)]="paciente"></ion-input>
+          <ion-label>Tipo de servicio</ion-label>
+          <ion-select [(ngModel)]="gender">
+            <ion-option value="f">Videoasistencia</ion-option>
+            <ion-option value="m">Presencial</ion-option>
+          </ion-select>
         </ion-item>
-    
+<!--    
     <ion-item>
       <ion-label floating>Fecha de inicio</ion-label>
       <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoInicioCita"></ion-datetime>
     </ion-item>
-  
-    <ion-item>        
-      <ion-label floating>Fecha de fin</ion-label>
-      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoFinCita"></ion-datetime>     
-    </ion-item>        
+
+  <ion-item>
+      <ion-label floating>Seleccionar fecha</ion-label>
+      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoInicioCita"></ion-datetime>
+  </ion-item>
+  -->
+  <ion-item>
+      <ion-label>Fecha de consulta:</ion-label>
+      <ion-input type="text" [(ngModel)]="fechaSeleccionada" placeholder="Ingrese la fecha" (click)="seleccionaFechaDeCita()" disabled="true"></ion-input>
+  </ion-item>
+
+
+    <ion-card *ngFor="let objHorarios of HORARIOS;let indice = index">
+      <ion-card-header>
+          Horario Disponible
+      </ion-card-header>
+      <ion-card-content>
+          {{objHorarios.horaInicio}} - {{objHorarios.horaFin}}
+          <button ion-button outline item-end icon-left  color="Primary" (click)="idCardPresionado(indice)">Seleccionar horario</button>
+      </ion-card-content>
+    </ion-card>
     
-    <ion-item>
-        <ion-label floating>Tipo de consulta</ion-label>
-        <ion-input type="text" [(ngModel)]="tipoConsulta"></ion-input>
-      </ion-item>
+<!--
+      <ion-card>
+      <ion-card-header>
+          Horario Disponible
+      </ion-card-header>
+      <ion-card-content>
+          08:00:00 - 08:30:00
+      </ion-card-content>
+    </ion-card>
 
-      <ion-item>
-          <ion-label floating>Tipo de pago</ion-label>
-          <ion-input type="text" [(ngModel)]="tipoPago"></ion-input>
-        </ion-item>
+    <ion-card>
+      <ion-card-header>
+          Horario Disponible
+      </ion-card-header>
+      <ion-card-content>
+          08:30:00 - 09:00:00
+      </ion-card-content>
+    </ion-card>
+-->
 
-      <p></p>
-  
+
   </ion-list>
-  
-  <button ion-button outline item-end icon-left  color="Primary" (click)="agregarCitaManualmente()">Aceptar <br>
+<!--
+  <div *ngFor="let i of horaInicioArray;let indice = index">{{indice}}</div>
+  <div *ngFor="let j of horaFinArray">{{j}}</div>
+-->
+<!--
+  <p *ngFor="let objHorarios of HORARIOS;let indice = index">
+      {{objHorarios.horaInicio}} - {{objHorarios.horaFin}}
+    </p>
+-->
+<!--
+  <ion-select placeholder="Select" [(ngModel)]="selected">
+      <ion-option *ngFor="let item of horaInicioArray" value="item">{{item}}</ion-option>
+  </ion-select>
+  -->
+
+  <button ion-button outline item-end icon-left  color="Primary" (click)="agregarCitaManualmente()">Aceptar<br>
     
   </button>
 
   <button ion-button outline item-end icon-left  color="Primary" (click)="cancelar()">Cancelar <br></button>
   
   <button ion-button item-end icon-left  color="Primary" (click)="consultarHorariosOcupados()">Horarios Ocupados<br></button>
-  
-  
+ <!-- 
+  <button ion-button item-end icon-left  color="Primary" (click)="seleccionaFechaDeCita()">Seleccionar hora<br></button>
+  -->
+
 </ion-content>

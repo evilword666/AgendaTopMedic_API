@@ -1,13 +1,14 @@
 webpackJsonp([4],{
 
-/***/ 104:
+/***/ 105:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CrearCitaPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ionic_native_date_picker__ = __webpack_require__(54);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -20,24 +21,69 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-/**
- * Generated class for the CrearCitaPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+
+
 var CrearCitaPage = /** @class */ (function () {
-    function CrearCitaPage(navCtrl, navParams, http) {
+    function CrearCitaPage(loadingCtrl, datePicker, navCtrl, navParams, http) {
+        this.loadingCtrl = loadingCtrl;
+        this.datePicker = datePicker;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.http = http;
+        this.horariosDisponibles = {};
         this.data = {};
-        this.fechaNuevoInicioCita = new Date().toISOString();
-        this.fechaNuevoFinCita = new Date().toISOString();
+        this.horaInicioArray = new Array();
+        this.horaFinArray = new Array();
+        this.HORARIOS = [];
+        //this.fechaNuevoInicioCita = new Date().toISOString();
+        //this.fechaNuevoFinCita = new Date().toISOString();
+        this.fechaSeleccionada = "";
+        this.horariosDisponibles.horaInicio = "";
+        this.horariosDisponibles.horaFin = "";
     }
     CrearCitaPage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad CrearCitaPage');
         //this.consultarHorariosOcupados()
+    };
+    CrearCitaPage.prototype.loadingBar = function () {
+        var _this = this;
+        this.loading = this.loadingCtrl.create({
+            spinner: 'circles',
+            content: "\n      <div class=\"custom-spinner-container\">\n        <div class=\"custom-spinner-box\">Cargando horarios disponibles...</div>\n      </div>",
+            duration: 3000
+        });
+        this.loading.onDidDismiss(function () {
+            console.log('Dismissed loading');
+            _this.consultarHorariosOcupados();
+        });
+        this.loading.present();
+    };
+    CrearCitaPage.prototype.seleccionaFechaDeCita = function () {
+        var _this = this;
+        //alert("Presionado el boton para seleccionar una hora")
+        this.datePicker.show({
+            date: new Date(),
+            mode: 'date',
+            locale: 'es_mx',
+            androidTheme: this.datePicker.ANDROID_THEMES.THEME_HOLO_LIGHT
+        }).then(function (date) {
+            console.log('Fecha seleccionada: ', date);
+            _this.fechaSeleccionada = _this.obtenerFecha(date);
+            _this.loadingBar();
+        }, function (err) { return console.log('Un error ocurrio mientras se seleccionaba la fecha: ', err); });
+    };
+    CrearCitaPage.prototype.obtenerFecha = function (formatoDate) {
+        var dd = formatoDate.getDate();
+        var mm = formatoDate.getMonth() + 1;
+        var yyyy = formatoDate.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        var fecha = yyyy + '-' + mm + '-' + dd;
+        return fecha;
     };
     CrearCitaPage.prototype.cancelar = function () {
         this.navCtrl.pop();
@@ -49,13 +95,23 @@ var CrearCitaPage = /** @class */ (function () {
         headers.append('Authorization', 'Token ' + window.localStorage.getItem("id_doctor")); //Aqui se agrega el key del medico obtenido del login
         var options = new __WEBPACK_IMPORTED_MODULE_2__angular_http__["d" /* RequestOptions */]({ headers: headers });
         var link = 'http://104.248.176.189:8001/api/v1/doctor/horarios/';
+        console.log("Entrando a funcion consultarHorariosOcupados()");
         try {
             this.http.get(link, options)
                 .subscribe(function (data) {
                 console.log(data);
                 _this.data.response = data["_body"];
                 var resp = JSON.parse(_this.data.response);
-                alert(JSON.stringify(resp));
+                var respString = JSON.stringify(resp['results']);
+                var respuestaObj = JSON.parse(respString);
+                for (var i = 0; i < Object.keys(resp['results']).length; i++) {
+                    var misHorarios = {
+                        horaInicio: respuestaObj[i]['hora_inicio'],
+                        horaFin: respuestaObj[i]['hora_final']
+                    };
+                    _this.HORARIOS.push(misHorarios);
+                }
+                //alert(JSON.stringify(this.HORARIOS))
             }, function (error) {
                 //alert(error)
                 console.log(error);
@@ -81,6 +137,9 @@ var CrearCitaPage = /** @class */ (function () {
             //console.log("Catch: "+error)
             alert("Hay un error en el servidor");
         }
+    };
+    CrearCitaPage.prototype.idCardPresionado = function (idCard) {
+        alert(idCard);
     };
     CrearCitaPage.prototype.agregarCitaManualmente = function () {
         var _this = this;
@@ -130,27 +189,26 @@ var CrearCitaPage = /** @class */ (function () {
     };
     CrearCitaPage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: 'page-crear-cita',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/crear-cita/crear-cita.html"*/'<!--\n  Generated template for the CrearCitaPage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>crearCita</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content text-center>\n\n\n  <ion-list> \n    \n      <ion-item>\n          <ion-label floating>Paciente</ion-label>\n          <ion-input type="text" [(ngModel)]="paciente"></ion-input>\n        </ion-item>\n    \n    <ion-item>\n      <ion-label floating>Fecha de inicio</ion-label>\n      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoInicioCita"></ion-datetime>\n    </ion-item>\n  \n    <ion-item>        \n      <ion-label floating>Fecha de fin</ion-label>\n      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoFinCita"></ion-datetime>     \n    </ion-item>        \n    \n    <ion-item>\n        <ion-label floating>Tipo de consulta</ion-label>\n        <ion-input type="text" [(ngModel)]="tipoConsulta"></ion-input>\n      </ion-item>\n\n      <ion-item>\n          <ion-label floating>Tipo de pago</ion-label>\n          <ion-input type="text" [(ngModel)]="tipoPago"></ion-input>\n        </ion-item>\n\n      <p></p>\n  \n  </ion-list>\n  \n  <button ion-button outline item-end icon-left  color="Primary" (click)="agregarCitaManualmente()">Aceptar <br>\n    \n  </button>\n\n  <button ion-button outline item-end icon-left  color="Primary" (click)="cancelar()">Cancelar <br></button>\n  \n  <button ion-button item-end icon-left  color="Primary" (click)="consultarHorariosOcupados()">Horarios Ocupados<br></button>\n  \n  \n</ion-content>\n'/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/crear-cita/crear-cita.html"*/,
+            selector: 'page-crear-cita',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/crear-cita/crear-cita.html"*/'<!--\n  Generated template for the CrearCitaPage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Agendar nueva Cita</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content text-center>\n\n\n  <ion-list> \n    \n      <ion-item>\n          <ion-label>Tipo de servicio</ion-label>\n          <ion-select [(ngModel)]="gender">\n            <ion-option value="f">Videoasistencia</ion-option>\n            <ion-option value="m">Presencial</ion-option>\n          </ion-select>\n        </ion-item>\n<!--    \n    <ion-item>\n      <ion-label floating>Fecha de inicio</ion-label>\n      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoInicioCita"></ion-datetime>\n    </ion-item>\n\n  <ion-item>\n      <ion-label floating>Seleccionar fecha</ion-label>\n      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoInicioCita"></ion-datetime>\n  </ion-item>\n  -->\n  <ion-item>\n      <ion-label>Fecha de consulta:</ion-label>\n      <ion-input type="text" [(ngModel)]="fechaSeleccionada" placeholder="Ingrese la fecha" (click)="seleccionaFechaDeCita()" disabled="true"></ion-input>\n  </ion-item>\n\n\n    <ion-card *ngFor="let objHorarios of HORARIOS;let indice = index">\n      <ion-card-header>\n          Horario Disponible\n      </ion-card-header>\n      <ion-card-content>\n          {{objHorarios.horaInicio}} - {{objHorarios.horaFin}}\n          <button ion-button outline item-end icon-left  color="Primary" (click)="idCardPresionado(indice)">Seleccionar horario</button>\n      </ion-card-content>\n    </ion-card>\n    \n<!--\n      <ion-card>\n      <ion-card-header>\n          Horario Disponible\n      </ion-card-header>\n      <ion-card-content>\n          08:00:00 - 08:30:00\n      </ion-card-content>\n    </ion-card>\n\n    <ion-card>\n      <ion-card-header>\n          Horario Disponible\n      </ion-card-header>\n      <ion-card-content>\n          08:30:00 - 09:00:00\n      </ion-card-content>\n    </ion-card>\n-->\n\n\n  </ion-list>\n<!--\n  <div *ngFor="let i of horaInicioArray;let indice = index">{{indice}}</div>\n  <div *ngFor="let j of horaFinArray">{{j}}</div>\n-->\n<!--\n  <p *ngFor="let objHorarios of HORARIOS;let indice = index">\n      {{objHorarios.horaInicio}} - {{objHorarios.horaFin}}\n    </p>\n-->\n<!--\n  <ion-select placeholder="Select" [(ngModel)]="selected">\n      <ion-option *ngFor="let item of horaInicioArray" value="item">{{item}}</ion-option>\n  </ion-select>\n  -->\n\n  <button ion-button outline item-end icon-left  color="Primary" (click)="agregarCitaManualmente()">Aceptar<br>\n    \n  </button>\n\n  <button ion-button outline item-end icon-left  color="Primary" (click)="cancelar()">Cancelar <br></button>\n  \n  <button ion-button item-end icon-left  color="Primary" (click)="consultarHorariosOcupados()">Horarios Ocupados<br></button>\n <!-- \n  <button ion-button item-end icon-left  color="Primary" (click)="seleccionaFechaDeCita()">Seleccionar hora<br></button>\n  -->\n\n</ion-content>\n'/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/crear-cita/crear-cita.html"*/,
         }),
-        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */]) === "function" && _c || Object])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */], __WEBPACK_IMPORTED_MODULE_3__ionic_native_date_picker__["a" /* DatePicker */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */]])
     ], CrearCitaPage);
     return CrearCitaPage;
-    var _a, _b, _c;
 }());
 
 //# sourceMappingURL=crear-cita.js.map
 
 /***/ }),
 
-/***/ 105:
+/***/ 106:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return LoginPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__home_home__ = __webpack_require__(157);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__home_home__ = __webpack_require__(158);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -391,19 +449,19 @@ module.exports = webpackAsyncContext;
 
 /***/ }),
 
-/***/ 157:
+/***/ 158:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return HomePage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__providers_database_database__ = __webpack_require__(158);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_background_mode__ = __webpack_require__(82);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__providers_database_database__ = __webpack_require__(159);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_background_mode__ = __webpack_require__(83);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_native_audio__ = __webpack_require__(161);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_local_notifications__ = __webpack_require__(162);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__crear_cita_crear_cita__ = __webpack_require__(104);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__crear_cita_crear_cita__ = __webpack_require__(105);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__ionic_native_unique_device_id__ = __webpack_require__(163);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -828,7 +886,7 @@ var HomePage = /** @class */ (function () {
         this.database.almacenarCitasEnBD(id_cita, fecha_cita, hora_inicio, hora_final, enlace_videochat, tipo_servicio, descripcion, antecedentes_principales, id_medico, id_paciente, nombre, apellido_paterno, apellido_materno, sexo, edad, numCitas).then(function (data) {
             //console.log(JSON.stringify("Numero de datos insertados: "+data))
             if (JSON.stringify(data) == numCitas + "") {
-                alert("Se agregaron todas las citas de la BD remota a la DB local");
+                //alert("Se agregaron todas las citas de la BD remota a la DB local")
                 console.log("Se agregaron las " + JSON.stringify(data) + "citas de la BD remota a la DB local");
                 _this.getCitas();
             }
@@ -954,7 +1012,7 @@ var HomePage = /** @class */ (function () {
             console.log(resp2);
             console.log("Se agregaran " + nFilas + " nuevas filas\n\n\nElementos pos[0]: " + JSON.stringify(resp2[0]) + " \n\n\nElementos pos[1]: " + JSON.stringify(resp2[1]));
             //alert("Se agregaran "+nFilas+" nuevas filas\n\n\nElementos pos[0]: "+JSON.stringify(resp2[0])+" \n\n\nElementos pos[1]: "+JSON.stringify(resp2[1]))
-            alert(Object.keys(resp2).length);
+            // alert(Object.keys(resp2).length)
             //        if(this.resp['respValue'] == "200"){
             for (var i = 0; i < Object.keys(resp2).length; i++) {
                 //for (let i = 0; i < nFilas; i++) {
@@ -1216,13 +1274,13 @@ var HomePage = /** @class */ (function () {
 
 /***/ }),
 
-/***/ 158:
+/***/ 159:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return DatabaseProvider; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ionic_native_sqlite__ = __webpack_require__(159);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ionic_native_sqlite__ = __webpack_require__(160);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1485,8 +1543,8 @@ var DatabaseProvider = /** @class */ (function () {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ModificarCitaPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ionic_native_date_picker__ = __webpack_require__(106);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ionic_native_date_picker__ = __webpack_require__(54);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1565,25 +1623,25 @@ Object(__WEBPACK_IMPORTED_MODULE_0__angular_platform_browser_dynamic__["a" /* pl
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_ionic_angular__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__ = __webpack_require__(203);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_status_bar__ = __webpack_require__(204);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_component__ = __webpack_require__(281);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__pages_home_home__ = __webpack_require__(157);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__pages_login_login__ = __webpack_require__(105);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__pages_home_home__ = __webpack_require__(158);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__pages_login_login__ = __webpack_require__(106);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__pages_modificar_cita_modificar_cita__ = __webpack_require__(206);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__pages_crear_cita_crear_cita__ = __webpack_require__(104);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__pages_crear_cita_crear_cita__ = __webpack_require__(105);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10_ionic2_calendar__ = __webpack_require__(282);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__angular_http__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__providers_database_database__ = __webpack_require__(158);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ionic_native_sqlite__ = __webpack_require__(159);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__ionic_native_background_mode__ = __webpack_require__(82);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__providers_database_database__ = __webpack_require__(159);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__ionic_native_sqlite__ = __webpack_require__(160);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__ionic_native_background_mode__ = __webpack_require__(83);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__ionic_native_native_audio__ = __webpack_require__(161);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__ionic_native_local_notifications__ = __webpack_require__(162);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__ionic_native_push__ = __webpack_require__(205);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__ionic_native_unique_device_id__ = __webpack_require__(163);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__ionic_native_in_app_browser__ = __webpack_require__(207);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__ionic_native_date_picker__ = __webpack_require__(106);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__ionic_native_date_picker__ = __webpack_require__(54);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1678,12 +1736,12 @@ var AppModule = /** @class */ (function () {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MyApp; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ionic_native_status_bar__ = __webpack_require__(204);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__ = __webpack_require__(203);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pages_login_login__ = __webpack_require__(105);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pages_login_login__ = __webpack_require__(106);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_push__ = __webpack_require__(205);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_background_mode__ = __webpack_require__(82);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_background_mode__ = __webpack_require__(83);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);

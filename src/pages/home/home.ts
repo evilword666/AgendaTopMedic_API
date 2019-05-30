@@ -533,7 +533,7 @@ almacenarHorariosEnLocalBD(id_cita: string, fecha_cita:string, hora_inicio:strin
         //console.log(JSON.stringify("Numero de datos insertados: "+data))
         
         if(JSON.stringify(data) == numCitas+""){
-            alert("Se agregaron todas las citas de la BD remota a la DB local")
+            //alert("Se agregaron todas las citas de la BD remota a la DB local")
             console.log("Se agregaron las "+JSON.stringify(data)+"citas de la BD remota a la DB local")
             this.getCitas();
         }
@@ -688,7 +688,7 @@ getDetallesCitaSeleccionada(fechaCitaSeleccionada,horaInicioCitaSeleccionada,hor
 
         //alert("Se agregaran "+nFilas+" nuevas filas\n\n\nElementos pos[0]: "+JSON.stringify(resp2[0])+" \n\n\nElementos pos[1]: "+JSON.stringify(resp2[1]))
 
-        alert(Object.keys(resp2).length)
+       // alert(Object.keys(resp2).length)
 //        if(this.resp['respValue'] == "200"){
 
             for (let i = 0; i < Object.keys(resp2).length; i++) {
