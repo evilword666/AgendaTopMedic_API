@@ -39801,6 +39801,12 @@ ion-navbar.toolbar {
   min-height: calc(46px + env(safe-area-inset-bottom));
 }
 
+page-crear-cita #scroll {
+  width: auto;
+  height: 315px;
+  overflow: auto;
+}
+
 page-home .toolbar-ios-primary .toolbar-background-ios, page-home .fab-ios, page-home .toolbar-md-primary .toolbar-background-md, page-home .fab-md {
   background: #096A9C;
 }
@@ -40211,4 +40217,10 @@ page-modal .option {
   background-color: #72a6e9;
   text-align: center;
   overflow: visible;
+}
+
+page-modificar-cita #scroll {
+  width: auto;
+  height: 315px;
+  overflow: auto;
 }

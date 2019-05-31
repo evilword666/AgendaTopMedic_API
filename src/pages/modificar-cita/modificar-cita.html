@@ -1,50 +1,67 @@
 
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>Modificar Cita</ion-title>
-  </ion-navbar>
-
-</ion-header>
-
-
-<ion-content text-center>
-
-
-  <ion-list> 
-    <ion-item>
-      <ion-label floating>Fecha de inicio</ion-label>
-      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoInicioCita"></ion-datetime>
-    </ion-item>
+    <ion-navbar>
+      <ion-title>Reagendar Cita</ion-title>
+    </ion-navbar>
   
-    <ion-item>        
-      <ion-label floating>Fecha de fin</ion-label>
-      <ion-datetime displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="fechaNuevoFinCita"></ion-datetime>     
-    </ion-item>        
-    
+  </ion-header>
+  
+  
+  <ion-content text-center>
+  
+  
+    <ion-list> 
+      
+        <ion-item>
+            <ion-label>Tipo de servicio</ion-label>
+            <ion-select [(ngModel)]="gender">
+              <ion-option value="f">Videoasistencia</ion-option>
+              <ion-option value="m">Presencial</ion-option>
+            </ion-select>
+          </ion-item>
+
     <ion-item>
-      <ion-label>Tipo de consulta: </ion-label>
-      <ion-select [(ngModel)]="tipoConsulta" multiple="false">
-        <ion-option>Presencial</ion-option>
-        <ion-option>Video-Asistencia</ion-option>
-      </ion-select>
+        <ion-label>Fecha de consulta:</ion-label>
+        <ion-input type="text" [(ngModel)]="fechaSeleccionada" placeholder="Seleccione nueva fecha" (click)="seleccionaFechaDeCita()" disabled="true"></ion-input>
     </ion-item>
 
-      <ion-item>
-        <ion-label floating>Descripcion</ion-label>
-        <ion-input type="text" [(ngModel)]="descripcion"></ion-input>
-      </ion-item>
-
-      <p></p>
-  
-  </ion-list>
-  
-  <button ion-button outline item-end icon-left  color="Primary" (click)="cancelar()">Aceptar <br>
+    <ion-item> 
+        <ion-label>Hora de inicio: </ion-label>
+        <ion-input type="text" [(ngModel)]="hora_inicio" placeholder="Inicio de consulta"  disabled="true"></ion-input>
+    </ion-item>
     
-  </button>
+    <ion-item>
+        <ion-label>Hora de fin:</ion-label>
+        <ion-input type="text" [(ngModel)]="hora_fin" placeholder="Fin de consulta" disabled="true"></ion-input>
+    </ion-item>
 
-  <button ion-button outline item-end icon-left  color="Primary" (click)="cancelar()">Cancelar <br>
-   
-  </button>
 
-</ion-content>
+  <br>
+    <div>
+        <ion-checkbox color="Primary" (click)="addValue($event)" [(ngModel)]="checked"></ion-checkbox>Reagendar fecha de consulta
+        <button ion-button outline item-end icon-left  color="Primary" (click)="loadingBar()" [hidden]=!checked>Verificar disponibilidad de Horarios</button>
+    </div>
+  
+  <div [hidden]=!checked id="scroll" >
+      <ion-card *ngFor="let objHorarios of HORARIOS;let indice = index">
+        <ion-card-header>
+            Horario Disponible
+        </ion-card-header>
+        <ion-card-content>
+            {{objHorarios.horaInicio}} - {{objHorarios.horaFin}}
+            <button ion-button outline item-end icon-left  color="Primary" (click)="idCardPresionado(indice)">Seleccionar horario</button>
+        </ion-card-content>
+      </ion-card>
+    </div>  
+
+    </ion-list>
+<!--  
+    <button ion-button outline item-end icon-left  color="Primary" (click)="agregarCitaManualmente()" [hidden]=!checked>Aceptar</button>
+-->
+    <button ion-button outline item-end icon-left  color="Primary" (click)="cancelar()">Cancelar <br></button>
+<!-- 
+    <button ion-button item-end icon-left  color="Primary" (click)="consultarHorariosOcupados()">Horarios Ocupados<br></button>
+-->
+  </ion-content>
+  

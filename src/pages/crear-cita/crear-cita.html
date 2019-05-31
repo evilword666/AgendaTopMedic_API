@@ -1,9 +1,4 @@
-<!--
-  Generated template for the CrearCitaPage page.
 
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
 
   <ion-navbar>
@@ -41,7 +36,22 @@
       <ion-input type="text" [(ngModel)]="fechaSeleccionada" placeholder="Ingrese la fecha" (click)="seleccionaFechaDeCita()" disabled="true"></ion-input>
   </ion-item>
 
+  <ion-item> 
+      <ion-label>Hora de inicio: </ion-label>
+      <ion-input type="text" [(ngModel)]="fechaSeleccionada" placeholder="Ingrese la fecha" (click)="seleccionaFechaDeCita()" disabled="true"></ion-input>
+  </ion-item>
+  
+  <ion-item>
+      <ion-label>Hora de fin:</ion-label>
+      <ion-input type="text" [(ngModel)]="fechaSeleccionada" placeholder="Ingrese la fecha" (click)="seleccionaFechaDeCita()" disabled="true"></ion-input>
+  </ion-item>
 
+  <div>
+      <ion-checkbox color="Primary" (click)="addValue($event)" [(ngModel)]="checked"></ion-checkbox>Reagendar fecha de consulta
+      <button ion-button outline item-end icon-left  color="Primary" (click)="loadingBar()" [hidden]=!checked>Verificar disponibilidad de Horarios</button>
+  </div>
+
+<div [hidden]=!checked id="scroll" >
     <ion-card *ngFor="let objHorarios of HORARIOS;let indice = index">
       <ion-card-header>
           Horario Disponible
@@ -51,6 +61,7 @@
           <button ion-button outline item-end icon-left  color="Primary" (click)="idCardPresionado(indice)">Seleccionar horario</button>
       </ion-card-content>
     </ion-card>
+  </div>  
     
 <!--
       <ion-card>

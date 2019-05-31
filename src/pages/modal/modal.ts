@@ -35,6 +35,7 @@ export class ModalPage {
   Sexo:any;
   padecimiento:any;
   nombre_completo_paciente:any;
+  paramsModal:any;
   
 
   constructor(private http:Http, public alertController: AlertController, private datePicker: DatePicker,public plt: Platform, private iab: InAppBrowser, public navCtrl: NavController, public navParams: NavParams, private view: ViewController) {
@@ -54,6 +55,8 @@ export class ModalPage {
     this.data.padecimiento='';;
     this.data.nombre_completo_paciente='';
     this.data.id_medico='';
+
+    this.paramsModal={}
   }
 
 
@@ -166,10 +169,30 @@ export class ModalPage {
     this.data.padecimiento=data.padecimiento;
     this.data.nombre_completo_paciente=data.nombre_completo_paciente;
     this.data.id_medico=data.id_medico;
-    //this.checkRango = this.verificarRangoDeFechasPorCita(this.data.fecha_consulta,this.data.hora_inicio,this.data.hora_fin)
-    //alert(this.checkRango)
-    //alert("id de la cita: "+this.data.booking_id)
+
+
+    this.paramsModal = {
+      fecha_consulta:this.data.fecha_consulta,
+      hora_inicio:this.data.hora_inicio,
+      hora_fin:this.data.hora_fin,
+      detalles_cita:this.data.detalles_cita,
+      tipo_servicio:this.data.tipo_servicio,
+      link_token:this.data.link_token,
+      link_token_original:this.data.link_token_original,
+  
+      booking_id:this.data.booking_id,
+      edad_paciente:this.data.edad_paciente,
+      Sexo:this.data.Sexo,
+      padecimiento:this.data.padecimiento,
+      nombre_completo_paciente:this.data.nombre_completo_paciente,
+      id_medico:this.data.id_medico
+    }
+
   }
+
+
+
+
 
   verificarRangoDeFechasPorCita(fecha,startHour,endHour){
 
@@ -259,7 +282,9 @@ export class ModalPage {
   }
 
   updateDataCita(){
-    this.navCtrl.push(ModificarCitaPage);  
+    //alert(this.paramsModal)
+    this.navCtrl.push(ModificarCitaPage,this.paramsModal);  
+
   }
 
 }

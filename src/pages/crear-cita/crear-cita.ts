@@ -20,14 +20,16 @@ export class CrearCitaPage {
   horaInicioArray =  new Array(); 
   horaFinArray =  new Array(); 
   HORARIOS = [];
+  checkBoxPresionado:boolean=true;
+  checked : boolean = false;
 
 
   constructor(public loadingCtrl: LoadingController, private datePicker: DatePicker, public navCtrl: NavController, public navParams: NavParams, private http:Http) {
     //this.fechaNuevoInicioCita = new Date().toISOString();
     //this.fechaNuevoFinCita = new Date().toISOString();
     this.fechaSeleccionada = "";
-    this.horariosDisponibles.horaInicio = ""
-    this.horariosDisponibles.horaFin = ""
+    this.horariosDisponibles.horaInicio = "";
+    this.horariosDisponibles.horaFin = "";
   }
 
   ionViewDidLoad() {
@@ -35,7 +37,16 @@ export class CrearCitaPage {
     //this.consultarHorariosOcupados()
   }
 
-  
+
+  addValue(e): void {
+    var isChecked = e.currentTarget.checked;
+    console.log(e.currentTarget);//undefined
+    console.log(this.checked);//it is working !!!
+    //alert(this.checked)
+    if(this.checked){
+      
+    }
+  }
 
   loadingBar() {
     this.loading = this.loadingCtrl.create({

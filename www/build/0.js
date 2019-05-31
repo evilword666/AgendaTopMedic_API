@@ -48,7 +48,7 @@ var ModalPageModule = /** @class */ (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ionic_native_in_app_browser__ = __webpack_require__(207);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__modificar_cita_modificar_cita__ = __webpack_require__(206);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_date_picker__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__angular_http__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__angular_http__ = __webpack_require__(26);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -135,6 +135,7 @@ var ModalPage = /** @class */ (function () {
         ;
         this.data.nombre_completo_paciente = '';
         this.data.id_medico = '';
+        this.paramsModal = {};
     }
     ModalPage.prototype.eliminarCitaAler = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -242,9 +243,21 @@ var ModalPage = /** @class */ (function () {
         this.data.padecimiento = data.padecimiento;
         this.data.nombre_completo_paciente = data.nombre_completo_paciente;
         this.data.id_medico = data.id_medico;
-        //this.checkRango = this.verificarRangoDeFechasPorCita(this.data.fecha_consulta,this.data.hora_inicio,this.data.hora_fin)
-        //alert(this.checkRango)
-        //alert("id de la cita: "+this.data.booking_id)
+        this.paramsModal = {
+            fecha_consulta: this.data.fecha_consulta,
+            hora_inicio: this.data.hora_inicio,
+            hora_fin: this.data.hora_fin,
+            detalles_cita: this.data.detalles_cita,
+            tipo_servicio: this.data.tipo_servicio,
+            link_token: this.data.link_token,
+            link_token_original: this.data.link_token_original,
+            booking_id: this.data.booking_id,
+            edad_paciente: this.data.edad_paciente,
+            Sexo: this.data.Sexo,
+            padecimiento: this.data.padecimiento,
+            nombre_completo_paciente: this.data.nombre_completo_paciente,
+            id_medico: this.data.id_medico
+        };
     };
     ModalPage.prototype.verificarRangoDeFechasPorCita = function (fecha, startHour, endHour) {
         var startTime;
@@ -312,11 +325,12 @@ var ModalPage = /** @class */ (function () {
         this.navCtrl.pop();
     };
     ModalPage.prototype.updateDataCita = function () {
-        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_3__modificar_cita_modificar_cita__["a" /* ModificarCitaPage */]);
+        //alert(this.paramsModal)
+        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_3__modificar_cita_modificar_cita__["a" /* ModificarCitaPage */], this.paramsModal);
     };
     ModalPage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: 'page-modal',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/modal/modal.html"*/'\n<ion-content class="main-view">\n\n  <div class="overlay" (click)="closeModal()"></div>\n  <div class="modal_content">\n    <h1><span id="logodetalles"></span> Detalles de cita <ion-icon id="cerrarmodal" ios="md-close-circle" md="md-close-circle" (click)="closeModal()"></ion-icon></h1>\n\n    <p class="detallecita"><span class="datocita"><ion-icon name="md-person"></ion-icon> Paciente:</span> {{data.nombre_completo_paciente}}</p>\n    <p class="detallecita"><span class="datocita"><ion-icon name="ios-calendar"></ion-icon> Edad:</span> {{data.edad_paciente}} años</p>\n    <p class="detallecita"><span class="datocita"><img id="sexicon" src="img/sexo.svg"> Sexo:</span> {{data.Sexo}}</p>\n\n    <p class="detallecita"><span class="datocita"><ion-icon name="clock"></ion-icon> Inicio consulta:</span><strong class="inicioconsulta">{{data.hora_inicio}}</strong></p>\n    <p class="detallecita"><span class="datocita"><ion-icon name="time"></ion-icon> Fin consulta:</span><strong class="finconsulta">{{data.hora_fin}}</strong></p>\n    <p class="detallecita"><span class="datocita"><ion-icon name="apps"></ion-icon> Tipo consulta:</span><strong>{{data.tipo_servicio}}</strong></p>\n    <p class="detallecita" id="padecimiento"><span class="datocita"><ion-icon name="md-document"></ion-icon> Padecimiento:</span>{{data.padecimiento}}</p>\n    <p class="detallecita"  id="detallescita"><span class="datocita"><ion-icon name="list"></ion-icon> Detalles:</span>{{data.detalles_cita}}</p>\n\n    <div id="botonVideoconsulta">\n        <!--<button ion-button outline item-end icon-right color="Primary" [hidden]="((data.tipo_servicio === \'Video asistencia\') && (data.checkRango === \'true\')) ? false : true" (click)="iniciarVideoconferencia()">Iniciar Video-Asistencia<br>-->\n        <button ion-button outline item-end icon-right color="Primary" [hidden]="data.tipo_servicio === \'Consulta Presencial\' ? true : false" (click)="iniciarVideoconferencia()">Iniciar Video-Asistencia<br>\n        <ion-icon name="ios-videocam"></ion-icon>\n      </button>\n    </div>\n\n    <ion-fab>\n      <button ion-fab >\n          <ion-icon name="md-calendar" large></ion-icon>\n       </button>\n       <ion-fab-list id="modificarcita" side="top"> \n        <button class="option" ion-fab (click)="eliminarCita()" ><ion-icon class="bco" ios="ios-trash-outline" md="ios-trash-outline"></ion-icon><ion-label>Cancelar cita</ion-label></button>\n        <button class="option" ion-fab (click)="updateDataCita()"><ion-icon class="bco" ios="ios-calendar-outline" md="ios-calendar-outline"></ion-icon><ion-label>Reagendar cita</ion-label></button>\n      </ion-fab-list>\n    </ion-fab>\n\n  </div>\n  \n</ion-content>'/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/modal/modal.html"*/,
+            selector: 'page-modal',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/modal/modal.html"*/'\n<ion-content class="main-view">\n\n  <div class="overlay" (click)="closeModal()"></div>\n  <div class="modal_content">\n    <h1><span id="logodetalles"></span> Detalles de cita <ion-icon id="cerrarmodal" ios="md-close-circle" md="md-close-circle" (click)="closeModal()"></ion-icon></h1>\n\n    <p class="detallecita"><span class="datocita"><ion-icon name="md-person"></ion-icon> Paciente:</span> {{data.nombre_completo_paciente}}</p>\n    <p class="detallecita"><span class="datocita"><ion-icon name="ios-calendar"></ion-icon> Edad:</span> {{data.edad_paciente}} años</p>\n    <p class="detallecita"><span class="datocita"><img id="sexicon" src="img/sexo.svg"> Sexo:</span> {{data.Sexo}}</p>\n\n    <p class="detallecita"><span class="datocita"><ion-icon name="clock"></ion-icon> Inicio consulta:</span><strong class="inicioconsulta">{{data.hora_inicio}}</strong></p>\n    <p class="detallecita"><span class="datocita"><ion-icon name="time"></ion-icon> Fin consulta:</span><strong class="finconsulta">{{data.hora_fin}}</strong></p>\n    <p class="detallecita"><span class="datocita"><ion-icon name="apps"></ion-icon> Tipo consulta:</span><strong>{{data.tipo_servicio}}</strong></p>\n    <p class="detallecita" id="padecimiento"><span class="datocita"><ion-icon name="md-document"></ion-icon> Padecimiento:</span>{{data.padecimiento}}</p>\n    <p class="detallecita"  id="detallescita"><span class="datocita"><ion-icon name="list"></ion-icon> Detalles:</span>{{data.detalles_cita}}</p>\n\n    <div id="botonVideoconsulta">\n        <!--<button ion-button outline item-end icon-right color="Primary" [hidden]="((data.tipo_servicio === \'Video asistencia\') && (data.checkRango === \'true\')) ? false : true" (click)="iniciarVideoconferencia()">Iniciar Video-Asistencia<br>-->\n        <button ion-button outline item-end icon-right color="Primary" [hidden]="data.tipo_servicio === \'Consulta Presencial\' ? true : false" (click)="iniciarVideoconferencia()">Iniciar Video-Asistencia<br>\n        <ion-icon name="ios-videocam"></ion-icon>\n      </button>\n    </div>\n\n    <ion-fab>\n      <button ion-fab >\n          <ion-icon name="md-calendar" large></ion-icon>\n       </button>\n       <ion-fab-list id="modificarcita" side="top"> \n        <button class="option" ion-fab (click)="eliminarCita()" ><ion-icon class="bco" ios="ios-trash-outline" md="ios-trash-outline"></ion-icon><ion-label>Cancelar cita</ion-label></button>\n        <button class="option" ion-fab (click)="updateDataCita()" ><ion-icon class="bco" ios="ios-calendar-outline" md="ios-calendar-outline"></ion-icon><ion-label>Reagendar cita</ion-label></button>\n      </ion-fab-list>\n    </ion-fab>\n\n  </div>\n  \n</ion-content>'/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/modal/modal.html"*/,
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_5__angular_http__["b" /* Http */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_4__ionic_native_date_picker__["a" /* DatePicker */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_2__ionic_native_in_app_browser__["a" /* InAppBrowser */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["l" /* ViewController */]])
     ], ModalPage);
