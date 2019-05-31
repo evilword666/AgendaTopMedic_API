@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams ,AlertController} from 'ionic-angular';
 import { RequestOptions,Headers,Http } from '@angular/http';
 import { DatePicker } from '@ionic-native/date-picker';
 import { LoadingController } from 'ionic-angular';
@@ -41,7 +41,7 @@ nombre_completo_paciente="";
 id_medico="";
 
   
-  constructor(public loadingCtrl: LoadingController, private datePicker: DatePicker, public navCtrl: NavController, public navParams: NavParams, private http:Http) {
+  constructor(public alertController: AlertController, public loadingCtrl: LoadingController, private datePicker: DatePicker, public navCtrl: NavController, public navParams: NavParams, private http:Http) {
     this.fechaSeleccionada = "";
     this.horariosDisponibles.horaInicio = "";
     this.horariosDisponibles.horaFin = "";
@@ -200,8 +200,84 @@ console.log("Entrando a funcion consultarHorariosOcupados()")
 
 
   idCardPresionado(idCard){
-    alert(idCard)
+    //alert(idCard)
+    this.reagendarCitaAlert()
   }
+
+
+  async reagendarCitaAlert() {
+    const alert = await this.alertController.create({
+      title: 'Reagendar cita',
+      message: 'Realmente desea reagendar esta cita?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            console.log('No se realiza ninguna accion');
+            //this.retrocederPagina()
+          }
+        }, {
+          text: 'Si',
+          handler: () => {
+            console.log('Confirm Okay');
+            this.reagendarCitaAPI()
+            //this.view.dismiss();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  reagendarCitaAPI(){
+    alert("Su cita ha sido reagendada exitosamente")
+    this.navCtrl.pop();
+  /*
+    const headers = new Headers()
+    headers.append('Content-Type','application/json')
+    headers.append('Authorization','Token '+window.localStorage.getItem("id_doctor")) 
+
+    let options = new RequestOptions({ headers: headers });
+    var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/citas/'+this.data.booking_id;           
+    //var credentials = JSON.stringify({id : this.data.link_token_original});
+    alert(options)
+
+    try {
+    
+    this.http.delete(link,options)                  
+    .subscribe(data => {
+
+      this.data.response = data["_body"]; 
+
+      var resp = JSON.parse(this.data.response);
+
+      alert("Respuesta: \n\n"+data)
+
+      //alert(resp['id'])
+      //alert(resp['response'])
+      
+          if(resp['response'] == "200"){
+ 
+            //this.exitoEliminacionCita();              
+          }else{
+            //this.errorEliminacionCita();               
+            //this.exitoLogin();
+          }
+      }, error => {
+        alert("Error: "+error)
+        console.log(error)
+        console.log("Oooops!");
+        alert("No se pudieron enviar los datos\nIntentelo mas tarde");          
+      });
+
+    } catch (error) {
+      alert("Hay un error en el servidor")
+    }
+  */
+  }//Fin funcion reagendarCitaAPI()
 
   
 }

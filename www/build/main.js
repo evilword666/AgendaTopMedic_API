@@ -1565,13 +1565,49 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 
 
 
 
 
 var ModificarCitaPage = /** @class */ (function () {
-    function ModificarCitaPage(loadingCtrl, datePicker, navCtrl, navParams, http) {
+    function ModificarCitaPage(alertController, loadingCtrl, datePicker, navCtrl, navParams, http) {
+        this.alertController = alertController;
         this.loadingCtrl = loadingCtrl;
         this.datePicker = datePicker;
         this.navCtrl = navCtrl;
@@ -1721,13 +1757,98 @@ var ModificarCitaPage = /** @class */ (function () {
         }
     };
     ModificarCitaPage.prototype.idCardPresionado = function (idCard) {
-        alert(idCard);
+        //alert(idCard)
+        this.reagendarCitaAlert();
     };
+    ModificarCitaPage.prototype.reagendarCitaAlert = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            var alert;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.alertController.create({
+                            title: 'Reagendar cita',
+                            message: 'Realmente desea reagendar esta cita?',
+                            buttons: [
+                                {
+                                    text: 'No',
+                                    role: 'cancel',
+                                    cssClass: 'secondary',
+                                    handler: function (blah) {
+                                        console.log('No se realiza ninguna accion');
+                                        //this.retrocederPagina()
+                                    }
+                                }, {
+                                    text: 'Si',
+                                    handler: function () {
+                                        console.log('Confirm Okay');
+                                        _this.reagendarCitaAPI();
+                                        //this.view.dismiss();
+                                    }
+                                }
+                            ]
+                        })];
+                    case 1:
+                        alert = _a.sent();
+                        return [4 /*yield*/, alert.present()];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ModificarCitaPage.prototype.reagendarCitaAPI = function () {
+        alert("Su cita ha sido reagendada exitosamente");
+        this.navCtrl.pop();
+        /*
+          const headers = new Headers()
+          headers.append('Content-Type','application/json')
+          headers.append('Authorization','Token '+window.localStorage.getItem("id_doctor"))
+      
+          let options = new RequestOptions({ headers: headers });
+          var link = 'http://104.248.176.189:8001/api/v1/doctor/mov/citas/'+this.data.booking_id;
+          //var credentials = JSON.stringify({id : this.data.link_token_original});
+          alert(options)
+      
+          try {
+          
+          this.http.delete(link,options)
+          .subscribe(data => {
+      
+            this.data.response = data["_body"];
+      
+            var resp = JSON.parse(this.data.response);
+      
+            alert("Respuesta: \n\n"+data)
+      
+            //alert(resp['id'])
+            //alert(resp['response'])
+            
+                if(resp['response'] == "200"){
+       
+                  //this.exitoEliminacionCita();
+                }else{
+                  //this.errorEliminacionCita();
+                  //this.exitoLogin();
+                }
+            }, error => {
+              alert("Error: "+error)
+              console.log(error)
+              console.log("Oooops!");
+              alert("No se pudieron enviar los datos\nIntentelo mas tarde");
+            });
+      
+          } catch (error) {
+            alert("Hay un error en el servidor")
+          }
+        */
+    }; //Fin funcion reagendarCitaAPI()
     ModificarCitaPage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-            selector: 'page-modificar-cita',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/modificar-cita/modificar-cita.html"*/'\n<ion-header>\n\n    <ion-navbar>\n      <ion-title>Reagendar Cita</ion-title>\n    </ion-navbar>\n  \n  </ion-header>\n  \n  \n  <ion-content text-center>\n  \n  \n    <ion-list> \n      \n        <ion-item>\n            <ion-label>Tipo de servicio</ion-label>\n            <ion-select [(ngModel)]="gender">\n              <ion-option value="f">Videoasistencia</ion-option>\n              <ion-option value="m">Presencial</ion-option>\n            </ion-select>\n          </ion-item>\n\n    <ion-item>\n        <ion-label>Fecha de consulta:</ion-label>\n        <ion-input type="text" [(ngModel)]="fechaSeleccionada" placeholder="Seleccione nueva fecha" (click)="seleccionaFechaDeCita()" disabled="true"></ion-input>\n    </ion-item>\n\n    <ion-item> \n        <ion-label>Hora de inicio: </ion-label>\n        <ion-input type="text" [(ngModel)]="hora_inicio" placeholder="Inicio de consulta"  disabled="true"></ion-input>\n    </ion-item>\n    \n    <ion-item>\n        <ion-label>Hora de fin:</ion-label>\n        <ion-input type="text" [(ngModel)]="hora_fin" placeholder="Fin de consulta" disabled="true"></ion-input>\n    </ion-item>\n\n\n  <br>\n    <div>\n        <ion-checkbox color="Primary" (click)="addValue($event)" [(ngModel)]="checked"></ion-checkbox>Reagendar fecha de consulta\n        <button ion-button outline item-end icon-left  color="Primary" (click)="loadingBar()" [hidden]=!checked>Verificar disponibilidad de Horarios</button>\n    </div>\n  \n  <div [hidden]=!checked id="scroll" >\n      <ion-card *ngFor="let objHorarios of HORARIOS;let indice = index">\n        <ion-card-header>\n            Horario Disponible\n        </ion-card-header>\n        <ion-card-content>\n            {{objHorarios.horaInicio}} - {{objHorarios.horaFin}}\n            <button ion-button outline item-end icon-left  color="Primary" (click)="idCardPresionado(indice)">Seleccionar horario</button>\n        </ion-card-content>\n      </ion-card>\n    </div>  \n\n    </ion-list>\n<!--  \n    <button ion-button outline item-end icon-left  color="Primary" (click)="agregarCitaManualmente()" [hidden]=!checked>Aceptar</button>\n-->\n    <button ion-button outline item-end icon-left  color="cancelar" (click)="cancelar()">Cancelar <br></button>\n<!-- \n    <button ion-button item-end icon-left  color="Primary" (click)="consultarHorariosOcupados()">Horarios Ocupados<br></button>\n-->\n  </ion-content>\n  '/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/modificar-cita/modificar-cita.html"*/,
+            selector: 'page-modificar-cita',template:/*ion-inline-start:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/modificar-cita/modificar-cita.html"*/'\n<ion-header>\n\n    <ion-navbar>\n      <ion-title>Reagendar Cita</ion-title>\n    </ion-navbar>\n  \n  </ion-header>\n  \n  \n  <ion-content text-center>\n  \n  \n    <ion-list> \n      \n        <ion-item>\n            <ion-label>Tipo de servicio</ion-label>\n            <ion-select [(ngModel)]="gender">\n              <ion-option value="f">Videoasistencia</ion-option>\n              <ion-option value="m">Presencial</ion-option>\n            </ion-select>\n          </ion-item>\n\n    <ion-item>\n        <ion-label>Fecha de consulta:</ion-label>\n        <ion-input type="text" [(ngModel)]="fechaSeleccionada" placeholder="Seleccione nueva fecha" (click)="seleccionaFechaDeCita()" disabled="true"></ion-input>\n    </ion-item>\n<!--\n    <ion-item> \n        <ion-label>Hora de inicio: </ion-label>\n        <ion-input type="text" [(ngModel)]="hora_inicio" placeholder="Inicio de consulta"  disabled="true"></ion-input>\n    </ion-item>\n    \n    <ion-item>\n        <ion-label>Hora de fin:</ion-label>\n        <ion-input type="text" [(ngModel)]="hora_fin" placeholder="Fin de consulta" disabled="true"></ion-input>\n    </ion-item>\n-->\n\n  <br>\n    <div>\n        <ion-checkbox color="Primary" (click)="addValue($event)" [(ngModel)]="checked"></ion-checkbox>Reagendar fecha de consulta\n        <button ion-button outline item-end icon-left  color="Primary" (click)="loadingBar()" [hidden]=!checked>Verificar disponibilidad de Horarios</button>\n    </div>\n  \n  <div [hidden]=!checked id="scroll" >\n      <ion-card *ngFor="let objHorarios of HORARIOS;let indice = index">\n        <ion-card-header>\n            Horario Disponible\n        </ion-card-header>\n        <ion-card-content>\n            {{objHorarios.horaInicio}} - {{objHorarios.horaFin}}\n            <button ion-button outline item-end icon-left  color="Primary" (click)="idCardPresionado(indice)">Seleccionar horario</button>\n        </ion-card-content>\n      </ion-card>\n    </div>  \n\n    </ion-list>\n<!--  \n    <button ion-button outline item-end icon-left  color="Primary" (click)="agregarCitaManualmente()" [hidden]=!checked>Aceptar</button>\n-->\n    <button ion-button outline item-end icon-left  color="cancelar" (click)="cancelar()">Cancelar <br></button>\n<!-- \n    <button ion-button item-end icon-left  color="Primary" (click)="consultarHorariosOcupados()">Horarios Ocupados<br></button>\n-->\n  </ion-content>\n  '/*ion-inline-end:"/Users/desarrollo/Documents/Agenda_TopMedic/Agenda_Top_Medic-API/src/pages/modificar-cita/modificar-cita.html"*/,
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */], __WEBPACK_IMPORTED_MODULE_3__ionic_native_date_picker__["a" /* DatePicker */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */]])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */], __WEBPACK_IMPORTED_MODULE_3__ionic_native_date_picker__["a" /* DatePicker */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2__angular_http__["b" /* Http */]])
     ], ModificarCitaPage);
     return ModificarCitaPage;
 }());
