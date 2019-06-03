@@ -51,8 +51,8 @@ export class LoginPage {
   }
 
   ionViewDidLoad() {
-    //this.user = "javier@gmail.com";
-    //this.pass = "lalaland2222";    
+    this.user = "javier@gmail.com";
+    this.pass = "lalaland2222";    
   }
 
   

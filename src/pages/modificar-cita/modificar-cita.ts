@@ -109,6 +109,9 @@ seleccionaFechaDeCita(){
       date =>{ 
         console.log('Fecha seleccionada: ', date)
         this.fechaSeleccionada = this.obtenerFecha(date);
+        this.HORARIOS = [];
+        //this.eventsCalendar.splice(0,this.eventsCalendar.length)
+
         //this.loadingBar();
       },
       err => console.log('Un error ocurrio mientras se seleccionaba la fecha: ', err)
@@ -138,12 +141,17 @@ obtenerFecha(formatoDate){
 
   consultarHorariosOcupados(){
 
+
  
     const headers = new Headers()
     headers.append('Content-Type','application/json')
     headers.append('Authorization','Token '+window.localStorage.getItem("id_doctor")) //Aqui se agrega el key del medico obtenido del login
     let options = new RequestOptions({ headers: headers });
-    var link = 'http://104.248.176.189:8001/api/v1/doctor/horarios/';
+    //alert(this.fechaSeleccionada)
+    var dt = new Date(this.fechaSeleccionada);//Con esto obtenemos el dia (lunes, martes...) en numero (1,2..)
+    let diaEnEntero = dt.getUTCDay()
+    
+    var link = 'http://104.248.176.189:8000/api/v1/doctor/horarios/?day='+diaEnEntero;
 console.log("Entrando a funcion consultarHorariosOcupados()")
     try {
 
